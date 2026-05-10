@@ -500,11 +500,27 @@
 
   <!-- Config bar -->
   <div class="config-bar">
-    <span class="config-label">URL WEBHOOK :</span>
+    <span class="config-label">URL / UUID :</span>
     <input class="config-input" id="webhookInput"
       value="https://webhook.site/token/42e9b838-f4c0-4861-8ac7-77a02b29ac0a/requests"
-      placeholder="https://webhook.site/token/UUID/requests">
+      placeholder="URL ou UUID webhook.site">
     <button class="btn primary" onclick="loadWebhook()">CHARGER</button>
+  </div>
+  <div class="config-bar" style="margin-top:-16px">
+    <span class="config-label">API TOKEN :</span>
+    <input class="config-input" id="tokenInput" placeholder="Si compte webhook.site → coller le token ici">
+    <button class="btn primary" onclick="loadWithToken()">AUTH</button>
+  </div>
+
+  <!-- Debug panel -->
+  <div style="background:var(--card);border:1px solid var(--border);border-radius:4px;margin-bottom:20px;overflow:hidden">
+    <div style="padding:10px 16px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center">
+      <span style="font-family:var(--sans);font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase">Debug Console</span>
+      <button class="btn" onclick="document.getElementById('debugBox').innerHTML=''">CLEAR</button>
+    </div>
+    <div id="debugBox" style="padding:10px 16px;max-height:140px;overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--border2) transparent;font-family:var(--mono)">
+      <div style="color:var(--muted);font-size:9px">En attente de chargement…</div>
+    </div>
   </div>
 
   <!-- Stats -->
@@ -787,47 +803,132 @@
     `).join('');
   }
 
+  function dbg(msg, type = 'info') {
+    const box = document.getElementById('debugBox');
+    if (!box) return;
+    const colors = { info: 'var(--muted)', ok: 'var(--accent)', err: 'var(--accent2)', warn: '#f59e0b' };
+    const icons = { info: '·', ok: '✓', err: '✗', warn: '!' };
+    const line = document.createElement('div');
+    line.style.cssText = `color:${colors[type]};font-size:9px;padding:2px 0;border-bottom:1px solid var(--border);`;
+    line.innerHTML = `<span style="opacity:.4">${new Date().toLocaleTimeString('fr-FR')}</span> <span style="color:${colors[type]}">${icons[type]}</span> ${msg}`;
+    box.appendChild(line);
+    box.scrollTop = box.scrollHeight;
+  }
+
   async function loadWebhook() {
-    const url = document.getElementById('webhookInput').value.trim();
-    if (!url) return;
+    const rawUrl = document.getElementById('webhookInput').value.trim();
+    if (!rawUrl) return;
 
     document.getElementById('loadingState')?.remove();
     document.getElementById('entriesList').innerHTML = '<div id="loadingState"><div class="spinner"></div><div>CHARGEMENT...</div></div>';
     document.getElementById('liveStatus').textContent = 'CHARGEMENT...';
 
+    // Extract UUID from any format pasted
+    const uuidMatch = rawUrl.match(/([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})/i);
+    const uuid = uuidMatch ? uuidMatch[1] : null;
+    const apiUrl = uuid
+      ? `https://webhook.site/token/${uuid}/requests?per_page=100&page=1`
+      : rawUrl;
+
+    dbg('UUID extrait : ' + (uuid || 'non trouvé'));
+    dbg('URL API : ' + apiUrl);
+
+    // Test 1: ping webhook.site root
+    dbg('→ Test connectivité webhook.site…');
     try {
-      // Webhook.site API: GET /token/{uuid}/requests
-      const apiUrl = url.includes('/requests') ? url : url + '/requests';
-      const res = await fetch(apiUrl + '?per_page=100&page=1', {
+      const pingRes = await fetch('https://webhook.site/', { method: 'HEAD', mode: 'no-cors' });
+      dbg('Ping webhook.site : mode opaque (réseau OK)', 'ok');
+    } catch(e) {
+      dbg('Ping échoué : ' + e.message, 'err');
+    }
+
+    // Test 2: fetch the API
+    dbg('→ Appel API token/requests…');
+    try {
+      const t0 = performance.now();
+      const res = await fetch(apiUrl, {
         headers: { 'Accept': 'application/json' }
       });
+      const t1 = performance.now();
+      dbg(`HTTP ${res.status} ${res.statusText} en ${Math.round(t1-t0)}ms`, res.ok ? 'ok' : 'err');
 
-      if (!res.ok) throw new Error('HTTP ' + res.status);
+      // Log response headers
+      for (const [k,v] of res.headers.entries()) {
+        if (['content-type','access-control-allow-origin','x-ratelimit-remaining'].includes(k.toLowerCase()))
+          dbg(`Header: ${k}: ${v}`, 'info');
+      }
+
+      if (!res.ok) {
+        const txt = await res.text();
+        dbg('Body erreur : ' + txt.substring(0, 200), 'err');
+        throw new Error('HTTP ' + res.status);
+      }
+
       const data = await res.json();
-      const entries = data.data || [];
+      dbg('JSON reçu — clés : ' + Object.keys(data).join(', '), 'ok');
+      dbg('data.data length : ' + (data.data?.length ?? 'undefined'), 'ok');
 
+      const entries = data.data || [];
       allEntries = entries;
       renderStats(entries);
       renderList(entries);
-      showToast('✓ ' + entries.length + ' entrée(s) chargée(s)');
+      showToast('✓ ' + entries.length + ' entrée(s)');
       document.getElementById('liveStatus').textContent = 'EN DIRECT';
+      dbg('Rendu terminé — ' + entries.length + ' entrées', 'ok');
+
     } catch(e) {
+      dbg('Erreur fetch : ' + e.name + ' — ' + e.message, 'err');
+      dbg('Cause probable : CORS bloqué par webhook.site (compte gratuit)', 'warn');
+      dbg('Solution : coller le token API depuis webhook.site (Settings)', 'warn');
+
       document.getElementById('entriesList').innerHTML = `
-        <div style="text-align:center;padding:40px;color:var(--accent2);font-size:10px;letter-spacing:0.1em">
-          ERREUR : ${e.message}<br><br>
-          <span style="color:var(--muted);font-size:9px">
-            Ouvrir webhook.site directement pour voir les requêtes.<br>
-            L'API webhook.site nécessite parfois un compte pour l'accès CORS.
-          </span>
+        <div style="padding:20px;color:var(--accent2);font-size:10px;letter-spacing:0.1em;line-height:1.8">
+          <div style="font-size:13px;font-weight:700;margin-bottom:12px">CORS BLOQUÉ</div>
+          <div style="color:var(--muted)">
+            Webhook.site bloque l'accès API depuis un navigateur sans token d'auth.<br><br>
+            <b style="color:var(--text)">Solution :</b><br>
+            1. Sur webhook.site → <b>Login / Sign Up</b><br>
+            2. Récupère ton <b>API Token</b> dans Settings<br>
+            3. Colle-le dans le champ ci-dessous<br><br>
+            <b style="color:var(--accent)">OU</b> utilise directement webhook.site pour lire les données — tout y est déjà.
+          </div>
         </div>`;
-      document.getElementById('liveStatus').textContent = 'ERREUR';
-      showToast('✗ Erreur de chargement');
+      document.getElementById('liveStatus').textContent = 'ERREUR CORS';
+      showToast('✗ Voir debug panel');
     }
   }
 
-  // Auto-refresh every 15s
+  // Token auth test
+  async function loadWithToken() {
+    const token = document.getElementById('tokenInput')?.value?.trim();
+    const rawUrl = document.getElementById('webhookInput').value.trim();
+    const uuidMatch = rawUrl.match(/([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})/i);
+    const uuid = uuidMatch?.[1];
+    if (!uuid || !token) { dbg('UUID ou token manquant', 'err'); return; }
+
+    const apiUrl = `https://webhook.site/token/${uuid}/requests?per_page=100&page=1`;
+    dbg('→ Appel avec API token…');
+    try {
+      const res = await fetch(apiUrl, {
+        headers: { 'Accept': 'application/json', 'Api-Key': token }
+      });
+      dbg('HTTP ' + res.status, res.ok ? 'ok' : 'err');
+      if (!res.ok) { const t = await res.text(); dbg(t.substring(0,200), 'err'); return; }
+      const data = await res.json();
+      const entries = data.data || [];
+      allEntries = entries;
+      renderStats(entries);
+      renderList(entries);
+      showToast('✓ ' + entries.length + ' entrée(s) via token');
+      document.getElementById('liveStatus').textContent = 'AUTH OK';
+      dbg('✓ Auth token fonctionne !', 'ok');
+    } catch(e) {
+      dbg('Token fetch échoué : ' + e.message, 'err');
+    }
+  }
+
   loadWebhook();
-  setInterval(loadWebhook, 15000);
+  setInterval(loadWebhook, 20000);
 </script>
 </body>
 </html>
