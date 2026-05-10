@@ -3,932 +3,399 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ADMIN — DASHBOARD</title>
-<link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<title>ADMIN — TRACKR</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #05050a;
-    --surface: #0a0a12;
-    --card: #0e0e18;
-    --border: #161625;
-    --border2: #1f1f35;
-    --accent: #00ff9d;
-    --accent-dim: rgba(0,255,157,0.08);
-    --accent2: #ff2d55;
-    --accent3: #a855f7;
-    --accent4: #0ea5e9;
-    --text: #e8e8f2;
-    --muted: #4a4a6a;
-    --muted2: #2a2a45;
-    --mono: 'Space Mono', monospace;
-    --sans: 'Syne', sans-serif;
+    --bg:#05050a; --surface:#0a0a12; --card:#0e0e18;
+    --border:#161625; --border2:#1f1f35;
+    --accent:#00ff9d; --adim:rgba(0,255,157,.08);
+    --accent2:#ff2d55; --accent3:#a855f7; --accent4:#0ea5e9;
+    --text:#e8e8f2; --muted:#4a4a6a;
+    --mono:'Space Mono',monospace; --sans:'Syne',sans-serif;
   }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:var(--bg);color:var(--text);font-family:var(--mono);min-height:100vh;}
+  body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(0,255,157,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(0,255,157,.025) 1px,transparent 1px);background-size:32px 32px;pointer-events:none;z-index:0;}
+  .scan-line{position:fixed;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(0,255,157,.08),transparent);animation:scan 8s linear infinite;pointer-events:none;z-index:5;}
+  @keyframes scan{0%{top:0}100%{top:100vh}}
 
-  * { margin: 0; padding: 0; box-sizing: border-box; }
+  header{position:sticky;top:0;z-index:100;background:rgba(5,5,10,.95);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);padding:0 32px;height:56px;display:flex;align-items:center;justify-content:space-between;}
+  .logo{font-family:var(--sans);font-size:15px;font-weight:800;letter-spacing:.05em;}
+  .logo span{color:var(--accent);}
+  .hbadge{font-size:9px;letter-spacing:.2em;color:var(--muted);border:1px solid var(--border2);padding:2px 8px;border-radius:2px;text-transform:uppercase;}
+  .hright{display:flex;align-items:center;gap:14px;}
+  .live{display:flex;align-items:center;gap:6px;font-size:10px;color:var(--muted);letter-spacing:.1em;}
+  .dot{width:6px;height:6px;border-radius:50%;background:var(--accent);animation:pulse 2s ease-in-out infinite;}
+  @keyframes pulse{0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(0,255,157,.4)}50%{opacity:.7;box-shadow:0 0 0 4px rgba(0,255,157,0)}}
+  .btn{font-family:var(--mono);font-size:10px;letter-spacing:.15em;text-transform:uppercase;padding:6px 14px;border:1px solid var(--border2);background:transparent;color:var(--muted);cursor:pointer;transition:all .2s;border-radius:2px;}
+  .btn:hover,.btn.primary{border-color:var(--accent);color:var(--accent);background:var(--adim);}
+  .btn.danger{border-color:rgba(255,45,85,.4);color:var(--accent2);}
+  .btn.danger:hover{background:rgba(255,45,85,.08);}
 
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: var(--mono);
-    min-height: 100vh;
-  }
+  main{position:relative;z-index:1;padding:28px 32px;max-width:1400px;margin:0 auto;}
 
-  /* Grid BG */
-  body::before {
-    content: '';
-    position: fixed;
-    inset: 0;
-    background-image:
-      linear-gradient(rgba(0,255,157,0.025) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(0,255,157,0.025) 1px, transparent 1px);
-    background-size: 32px 32px;
-    pointer-events: none;
-    z-index: 0;
-  }
+  /* CONFIG */
+  .config-row{display:flex;gap:8px;align-items:center;margin-bottom:10px;}
+  .cfg-label{font-size:9px;color:var(--muted);letter-spacing:.15em;text-transform:uppercase;white-space:nowrap;min-width:80px;}
+  .cfg-input{flex:1;font-family:var(--mono);font-size:10px;background:var(--card);border:1px solid var(--border2);color:var(--text);padding:7px 12px;border-radius:2px;outline:none;transition:border-color .2s;}
+  .cfg-input:focus{border-color:var(--accent);}
 
-  /* HEADER */
-  header {
-    position: sticky;
-    top: 0;
-    z-index: 100;
-    background: rgba(5,5,10,0.92);
-    backdrop-filter: blur(16px);
-    border-bottom: 1px solid var(--border);
-    padding: 0 32px;
-    height: 56px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
+  /* DEBUG */
+  .debug-panel{background:var(--card);border:1px solid var(--border);border-radius:4px;margin-bottom:20px;overflow:hidden;}
+  .debug-header{padding:9px 16px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;}
+  .debug-title{font-family:var(--sans);font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;}
+  #debugBox{padding:8px 16px;max-height:120px;overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--border2) transparent;}
+  .dline{font-size:9px;padding:2px 0;border-bottom:1px solid var(--border);display:flex;gap:6px;}
+  .dline .dt{color:var(--muted);flex-shrink:0;}
+  .dline.ok .dm{color:var(--accent);}
+  .dline.err .dm{color:var(--accent2);}
+  .dline.warn .dm{color:#f59e0b;}
+  .dline.info .dm{color:var(--muted);}
 
-  .header-left {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-  }
+  /* STATS */
+  .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px;}
+  .stat{background:var(--card);border:1px solid var(--border);padding:16px 20px;border-radius:4px;position:relative;overflow:hidden;}
+  .stat::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--c,var(--accent)),transparent);opacity:.6;}
+  .stat.c1{--c:var(--accent)}.stat.c2{--c:var(--accent2)}.stat.c3{--c:var(--accent3)}.stat.c4{--c:var(--accent4)}
+  .stat-label{font-size:9px;letter-spacing:.2em;color:var(--muted);text-transform:uppercase;margin-bottom:8px;}
+  .stat-val{font-family:var(--sans);font-size:28px;font-weight:800;line-height:1;}
+  .stat-sub{font-size:9px;color:var(--muted);margin-top:4px;}
 
-  .logo {
-    font-family: var(--sans);
-    font-size: 15px;
-    font-weight: 800;
-    letter-spacing: 0.05em;
-    color: var(--text);
-  }
+  /* GRID */
+  .grid{display:grid;grid-template-columns:1fr 340px;gap:16px;}
+  .panel{background:var(--card);border:1px solid var(--border);border-radius:4px;overflow:hidden;}
+  .panel-head{padding:13px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+  .panel-title{font-family:var(--sans);font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;}
+  .panel-count{font-size:10px;color:var(--muted);}
 
-  .logo span { color: var(--accent); }
+  /* ENTRIES */
+  .entries-list{padding:10px;display:flex;flex-direction:column;gap:7px;max-height:72vh;overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--border2) transparent;}
+  .ecard{background:var(--surface);border:1px solid var(--border);border-radius:3px;padding:13px;cursor:pointer;transition:border-color .15s,background .15s;position:relative;}
+  .ecard:hover{border-color:var(--border2);background:var(--card);}
+  .ecard.active{border-color:var(--accent);background:var(--adim);}
+  .ecard::before{content:'';position:absolute;left:0;top:0;bottom:0;width:2px;background:var(--accent);opacity:0;transition:opacity .2s;}
+  .ecard.active::before{opacity:1;}
+  .etop{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;}
+  .enum{font-family:var(--sans);font-size:11px;font-weight:700;color:var(--accent);}
+  .etime{font-size:9px;color:var(--muted);}
+  .eip{font-family:var(--sans);font-size:14px;font-weight:700;margin-bottom:6px;}
+  .echips{display:flex;flex-wrap:wrap;gap:4px;}
+  .echip{font-size:8px;letter-spacing:.08em;padding:2px 6px;border:1px solid var(--border2);border-radius:2px;color:var(--muted);text-transform:uppercase;}
 
-  .header-badge {
-    font-size: 9px;
-    letter-spacing: 0.2em;
-    color: var(--muted);
-    border: 1px solid var(--border2);
-    padding: 2px 8px;
-    border-radius: 2px;
-    text-transform: uppercase;
-  }
+  /* DETAIL */
+  .detail-body{max-height:calc(72vh + 44px);overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--border2) transparent;}
+  .detail-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;height:200px;color:var(--muted);font-size:11px;gap:8px;letter-spacing:.1em;}
+  .dsec{border-bottom:1px solid var(--border);}
+  .dsec-head{padding:9px 16px;font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);background:var(--surface);display:flex;gap:6px;}
+  .drows{padding:6px 16px;}
+  .drow{display:flex;justify-content:space-between;align-items:baseline;padding:4px 0;border-bottom:1px solid var(--border);gap:8px;}
+  .drow:last-child{border-bottom:none;}
+  .dk{font-size:9px;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;flex-shrink:0;}
+  .dv{font-size:10px;text-align:right;word-break:break-all;}
+  .dv.a1{color:var(--accent)}.dv.a2{color:var(--accent2)}.dv.a3{color:var(--accent3)}.dv.a4{color:var(--accent4)}
 
-  .header-right {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-  }
+  .spinner{width:22px;height:22px;border:1px solid var(--border2);border-top-color:var(--accent);border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 10px;}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  #loadingState{text-align:center;padding:50px 20px;color:var(--muted);font-size:11px;letter-spacing:.1em;}
 
-  .live-dot {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    font-size: 10px;
-    color: var(--muted);
-    letter-spacing: 0.1em;
-  }
+  .toast{position:fixed;bottom:24px;right:24px;background:var(--card);border:1px solid var(--accent);color:var(--accent);font-size:10px;letter-spacing:.1em;padding:10px 16px;border-radius:3px;transform:translateY(80px);opacity:0;transition:all .3s;z-index:200;}
+  .toast.show{transform:translateY(0);opacity:1;}
 
-  .dot {
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    background: var(--accent);
-    animation: pulse 2s ease-in-out infinite;
-  }
-
-  @keyframes pulse {
-    0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(0,255,157,0.4); }
-    50% { opacity: 0.7; box-shadow: 0 0 0 4px rgba(0,255,157,0); }
-  }
-
-  .btn {
-    font-family: var(--mono);
-    font-size: 10px;
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
-    padding: 6px 14px;
-    border: 1px solid var(--border2);
-    background: transparent;
-    color: var(--muted);
-    cursor: pointer;
-    transition: all 0.2s;
-    border-radius: 2px;
-  }
-
-  .btn:hover { border-color: var(--accent); color: var(--accent); }
-  .btn.primary { border-color: var(--accent); color: var(--accent); background: var(--accent-dim); }
-
-  /* MAIN LAYOUT */
-  main {
-    position: relative;
-    z-index: 1;
-    padding: 32px;
-    max-width: 1400px;
-    margin: 0 auto;
-  }
-
-  /* STATS ROW */
-  .stats-row {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 12px;
-    margin-bottom: 24px;
-  }
-
-  .stat-card {
-    background: var(--card);
-    border: 1px solid var(--border);
-    padding: 16px 20px;
-    border-radius: 4px;
-    position: relative;
-    overflow: hidden;
-  }
-
-  .stat-card::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 1px;
-    background: linear-gradient(90deg, transparent, var(--accent-color, var(--accent)), transparent);
-    opacity: 0.5;
-  }
-
-  .stat-card.c1 { --accent-color: var(--accent); }
-  .stat-card.c2 { --accent-color: var(--accent2); }
-  .stat-card.c3 { --accent-color: var(--accent3); }
-  .stat-card.c4 { --accent-color: var(--accent4); }
-
-  .stat-label {
-    font-size: 9px;
-    letter-spacing: 0.2em;
-    color: var(--muted);
-    text-transform: uppercase;
-    margin-bottom: 8px;
-  }
-
-  .stat-value {
-    font-family: var(--sans);
-    font-size: 28px;
-    font-weight: 800;
-    color: var(--text);
-    line-height: 1;
-  }
-
-  .stat-sub {
-    font-size: 9px;
-    color: var(--muted);
-    margin-top: 4px;
-  }
-
-  /* CONTENT GRID */
-  .content-grid {
-    display: grid;
-    grid-template-columns: 1fr 340px;
-    gap: 16px;
-  }
-
-  /* ENTRIES PANEL */
-  .panel {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 4px;
-    overflow: hidden;
-  }
-
-  .panel-header {
-    padding: 14px 20px;
-    border-bottom: 1px solid var(--border);
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
-
-  .panel-title {
-    font-family: var(--sans);
-    font-size: 12px;
-    font-weight: 700;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: var(--text);
-  }
-
-  .panel-count {
-    font-size: 10px;
-    color: var(--muted);
-  }
-
-  /* ENTRY CARDS */
-  .entries-list {
-    padding: 12px;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    max-height: 70vh;
-    overflow-y: auto;
-    scrollbar-width: thin;
-    scrollbar-color: var(--border2) transparent;
-  }
-
-  .entry-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 3px;
-    padding: 14px;
-    cursor: pointer;
-    transition: border-color 0.2s, background 0.2s;
-    position: relative;
-  }
-
-  .entry-card:hover { border-color: var(--border2); background: var(--card); }
-  .entry-card.active { border-color: var(--accent); background: var(--accent-dim); }
-
-  .entry-card::before {
-    content: '';
-    position: absolute;
-    left: 0; top: 0; bottom: 0;
-    width: 2px;
-    background: var(--accent);
-    opacity: 0;
-    transition: opacity 0.2s;
-  }
-  .entry-card.active::before { opacity: 1; }
-
-  .entry-top {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    margin-bottom: 10px;
-  }
-
-  .entry-num {
-    font-family: var(--sans);
-    font-size: 11px;
-    font-weight: 700;
-    color: var(--accent);
-  }
-
-  .entry-time {
-    font-size: 9px;
-    color: var(--muted);
-    letter-spacing: 0.05em;
-  }
-
-  .entry-ip {
-    font-size: 13px;
-    font-weight: 700;
-    color: var(--text);
-    margin-bottom: 6px;
-    font-family: var(--sans);
-  }
-
-  .entry-chips {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 4px;
-  }
-
-  .chip {
-    font-size: 8px;
-    letter-spacing: 0.1em;
-    padding: 2px 6px;
-    border: 1px solid var(--border2);
-    border-radius: 2px;
-    color: var(--muted);
-    text-transform: uppercase;
-    white-space: nowrap;
-  }
-
-  /* DETAIL PANEL */
-  .detail-panel {
-    display: flex;
-    flex-direction: column;
-    gap: 0;
-    max-height: calc(70vh + 56px);
-    overflow-y: auto;
-    scrollbar-width: thin;
-    scrollbar-color: var(--border2) transparent;
-  }
-
-  .detail-empty {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    height: 200px;
-    color: var(--muted);
-    font-size: 11px;
-    gap: 8px;
-    text-align: center;
-    letter-spacing: 0.1em;
-  }
-
-  .detail-section {
-    border-bottom: 1px solid var(--border);
-  }
-
-  .detail-section-header {
-    padding: 10px 16px;
-    font-size: 9px;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    color: var(--muted);
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    background: var(--surface);
-  }
-
-  .detail-rows { padding: 8px 16px; }
-
-  .detail-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: baseline;
-    padding: 4px 0;
-    border-bottom: 1px solid var(--border);
-    gap: 8px;
-  }
-
-  .detail-row:last-child { border-bottom: none; }
-
-  .detail-key {
-    font-size: 9px;
-    color: var(--muted);
-    letter-spacing: 0.08em;
-    flex-shrink: 0;
-    text-transform: uppercase;
-  }
-
-  .detail-val {
-    font-size: 10px;
-    color: var(--text);
-    text-align: right;
-    word-break: break-all;
-  }
-
-  .detail-val.accent { color: var(--accent); }
-  .detail-val.accent2 { color: var(--accent2); }
-  .detail-val.accent3 { color: var(--accent3); }
-  .detail-val.accent4 { color: var(--accent4); }
-
-  /* EMPTY / LOADING */
-  #loadingState {
-    text-align: center;
-    padding: 60px 20px;
-    color: var(--muted);
-    font-size: 11px;
-    letter-spacing: 0.1em;
-  }
-
-  .spinner {
-    width: 24px;
-    height: 24px;
-    border: 1px solid var(--border2);
-    border-top-color: var(--accent);
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-    margin: 0 auto 12px;
-  }
-
-  @keyframes spin { to { transform: rotate(360deg); } }
-
-  /* WEBHOOK INPUT */
-  .config-bar {
-    display: flex;
-    gap: 8px;
-    margin-bottom: 24px;
-    align-items: center;
-  }
-
-  .config-label {
-    font-size: 9px;
-    color: var(--muted);
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
-    white-space: nowrap;
-  }
-
-  .config-input {
-    flex: 1;
-    font-family: var(--mono);
-    font-size: 10px;
-    background: var(--card);
-    border: 1px solid var(--border2);
-    color: var(--text);
-    padding: 8px 12px;
-    border-radius: 2px;
-    outline: none;
-    transition: border-color 0.2s;
-  }
-
-  .config-input:focus { border-color: var(--accent); }
-
-  /* Scan line */
-  .scan-line {
-    position: fixed;
-    left: 0; right: 0;
-    height: 1px;
-    background: linear-gradient(90deg, transparent, rgba(0,255,157,0.08), transparent);
-    animation: scan 8s linear infinite;
-    pointer-events: none;
-    z-index: 5;
-  }
-
-  @keyframes scan {
-    0% { top: 0; }
-    100% { top: 100vh; }
-  }
-
-  /* TOAST */
-  .toast {
-    position: fixed;
-    bottom: 24px;
-    right: 24px;
-    background: var(--card);
-    border: 1px solid var(--accent);
-    color: var(--accent);
-    font-size: 10px;
-    letter-spacing: 0.1em;
-    padding: 10px 16px;
-    border-radius: 3px;
-    transform: translateY(80px);
-    opacity: 0;
-    transition: all 0.3s ease;
-    z-index: 200;
-  }
-
-  .toast.show { transform: translateY(0); opacity: 1; }
-
-  @media (max-width: 900px) {
-    main { padding: 16px; }
-    .stats-row { grid-template-columns: repeat(2, 1fr); }
-    .content-grid { grid-template-columns: 1fr; }
-    header { padding: 0 16px; }
-  }
+  @media(max-width:900px){main{padding:16px;}.stats{grid-template-columns:repeat(2,1fr)}.grid{grid-template-columns:1fr}header{padding:0 16px}}
 </style>
 </head>
 <body>
-
 <div class="scan-line"></div>
-
 <header>
-  <div class="header-left">
+  <div style="display:flex;align-items:center;gap:14px;">
     <div class="logo">TRACK<span>R</span></div>
-    <div class="header-badge">Admin Panel v1.0</div>
+    <div class="hbadge">Admin Panel</div>
   </div>
-  <div class="header-right">
-    <div class="live-dot"><div class="dot"></div><span id="liveStatus">EN DIRECT</span></div>
-    <button class="btn primary" onclick="loadWebhook()">↻ REFRESH</button>
+  <div class="hright">
+    <div class="live"><div class="dot"></div><span id="liveStatus">EN DIRECT</span></div>
+    <button class="btn danger" onclick="clearAllData()">🗑 VIDER</button>
+    <button class="btn primary" onclick="load()">↻ REFRESH</button>
   </div>
 </header>
 
 <main>
-
-  <!-- Config bar -->
-  <div class="config-bar">
-    <span class="config-label">URL / UUID :</span>
-    <input class="config-input" id="webhookInput"
-      value="https://webhook.site/token/42e9b838-f4c0-4861-8ac7-77a02b29ac0a/requests"
-      placeholder="URL ou UUID webhook.site">
-    <button class="btn primary" onclick="loadWebhook()">CHARGER</button>
+  <!-- Config -->
+  <div class="config-row">
+    <span class="cfg-label">MASTER KEY</span>
+    <input class="cfg-input" id="keyInput" value="$2a$10$RJJzngRdsLcBKKX4li2F/.fzYp6hKnGmIn7XLfbKHkjLNJEfcfV3S" type="password">
+    <button class="btn" onclick="toggleKey()">👁</button>
   </div>
-  <div class="config-bar" style="margin-top:-16px">
-    <span class="config-label">API TOKEN :</span>
-    <input class="config-input" id="tokenInput" placeholder="Si compte webhook.site → coller le token ici">
-    <button class="btn primary" onclick="loadWithToken()">AUTH</button>
+  <div class="config-row" style="margin-bottom:16px;">
+    <span class="cfg-label">BIN ID</span>
+    <input class="cfg-input" id="binInput" placeholder="Auto-détecté depuis localStorage du tracker — ou colle l'ID ici">
+    <button class="btn primary" onclick="load()">CHARGER</button>
   </div>
 
-  <!-- Debug panel -->
-  <div style="background:var(--card);border:1px solid var(--border);border-radius:4px;margin-bottom:20px;overflow:hidden">
-    <div style="padding:10px 16px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center">
-      <span style="font-family:var(--sans);font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase">Debug Console</span>
+  <!-- Debug -->
+  <div class="debug-panel">
+    <div class="debug-header">
+      <span class="debug-title">Console Debug</span>
       <button class="btn" onclick="document.getElementById('debugBox').innerHTML=''">CLEAR</button>
     </div>
-    <div id="debugBox" style="padding:10px 16px;max-height:140px;overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--border2) transparent;font-family:var(--mono)">
-      <div style="color:var(--muted);font-size:9px">En attente de chargement…</div>
-    </div>
+    <div id="debugBox"><div class="dline info"><span class="dm">En attente…</span></div></div>
   </div>
 
   <!-- Stats -->
-  <div class="stats-row">
-    <div class="stat-card c1">
-      <div class="stat-label">Total visites</div>
-      <div class="stat-value" id="statTotal">—</div>
-      <div class="stat-sub">requêtes reçues</div>
-    </div>
-    <div class="stat-card c2">
-      <div class="stat-label">Dernière visite</div>
-      <div class="stat-value" id="statLast" style="font-size:16px;padding-top:6px">—</div>
-      <div class="stat-sub" id="statLastSub">—</div>
-    </div>
-    <div class="stat-card c3">
-      <div class="stat-label">IPs uniques</div>
-      <div class="stat-value" id="statIPs">—</div>
-      <div class="stat-sub">adresses distinctes</div>
-    </div>
-    <div class="stat-card c4">
-      <div class="stat-label">Plateformes</div>
-      <div class="stat-value" id="statPlatforms">—</div>
-      <div class="stat-sub" id="statPlatformsSub">—</div>
-    </div>
+  <div class="stats">
+    <div class="stat c1"><div class="stat-label">Total visites</div><div class="stat-val" id="sTotal">—</div><div class="stat-sub">entrées stockées</div></div>
+    <div class="stat c2"><div class="stat-label">Dernière visite</div><div class="stat-val" id="sLast" style="font-size:16px;padding-top:6px">—</div><div class="stat-sub" id="sLastSub">—</div></div>
+    <div class="stat c3"><div class="stat-label">IPs uniques</div><div class="stat-val" id="sIPs">—</div><div class="stat-sub">adresses distinctes</div></div>
+    <div class="stat c4"><div class="stat-label">OS majoritaire</div><div class="stat-val" id="sOS" style="font-size:16px;padding-top:6px">—</div><div class="stat-sub" id="sOSSub">—</div></div>
   </div>
 
   <!-- Content -->
-  <div class="content-grid">
-
-    <!-- Entries list -->
+  <div class="grid">
     <div class="panel">
-      <div class="panel-header">
+      <div class="panel-head">
         <span class="panel-title">Entrées</span>
-        <span class="panel-count" id="entriesCount">—</span>
+        <span class="panel-count" id="eCount">—</span>
       </div>
-      <div class="entries-list" id="entriesList">
-        <div id="loadingState">
-          <div class="spinner"></div>
-          <div>CHARGEMENT...</div>
-        </div>
+      <div class="entries-list" id="eList">
+        <div id="loadingState"><div class="spinner"></div><div>EN ATTENTE D'UN BIN ID…</div></div>
       </div>
     </div>
-
-    <!-- Detail -->
     <div class="panel">
-      <div class="panel-header">
+      <div class="panel-head">
         <span class="panel-title">Détail</span>
-        <span class="panel-count" id="detailTitle">—</span>
+        <span class="panel-count" id="dTitle">—</span>
       </div>
-      <div class="detail-panel" id="detailPanel">
-        <div class="detail-empty">
-          <div style="font-size:24px">←</div>
-          <div>SÉLECTIONNER UNE ENTRÉE</div>
-        </div>
+      <div class="detail-body" id="dPanel">
+        <div class="detail-empty"><div style="font-size:22px">←</div><div>SÉLECTIONNER UNE ENTRÉE</div></div>
       </div>
     </div>
-
   </div>
 </main>
-
 <div class="toast" id="toast"></div>
 
 <script>
-  let allEntries = [];
-  let selectedIdx = -1;
+// ═══════════════════════════════════════════
+const BIN_ID_KEY = "trackerr_bin_id";
+// ═══════════════════════════════════════════
 
-  function showToast(msg) {
-    const t = document.getElementById('toast');
-    t.textContent = msg;
-    t.classList.add('show');
-    setTimeout(() => t.classList.remove('show'), 2500);
+let allEntries = [];
+
+function dbg(msg, type='info') {
+  const box = document.getElementById('debugBox');
+  const line = document.createElement('div');
+  line.className = 'dline ' + type;
+  line.innerHTML = `<span class="dt">${new Date().toLocaleTimeString('fr-FR')}</span><span class="dm">${msg}</span>`;
+  box.appendChild(line);
+  box.scrollTop = box.scrollHeight;
+}
+
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+function toggleKey() {
+  const i = document.getElementById('keyInput');
+  i.type = i.type === 'password' ? 'text' : 'password';
+}
+
+function getBinId() {
+  const manual = document.getElementById('binInput').value.trim();
+  if (manual) return manual;
+  return localStorage.getItem(BIN_ID_KEY);
+}
+
+function detectBrowser(ua='') {
+  if (ua.includes('Firefox')) return 'Firefox';
+  if (ua.includes('Edg/')) return 'Edge';
+  if (ua.includes('OPR')||ua.includes('Opera')) return 'Opera';
+  if (ua.includes('Chrome')) return 'Chrome';
+  if (ua.includes('Safari')) return 'Safari';
+  return '?';
+}
+function detectOS(ua='') {
+  if (ua.includes('Windows NT')) return 'Windows';
+  if (ua.includes('Mac OS X')) return 'macOS';
+  if (ua.includes('Android')) return 'Android';
+  if (ua.includes('iPhone')||ua.includes('iPad')) return 'iOS';
+  if (ua.includes('Linux')) return 'Linux';
+  return '?';
+}
+
+function renderStats(entries) {
+  document.getElementById('sTotal').textContent = entries.length;
+  if (entries.length > 0) {
+    const d = new Date(entries[0].timestamp || Date.now());
+    document.getElementById('sLast').textContent = d.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});
+    document.getElementById('sLastSub').textContent = d.toLocaleDateString('fr-FR');
   }
+  const ips = new Set(entries.map(e => e.reseau?.ip || e.meta?.ip).filter(Boolean));
+  document.getElementById('sIPs').textContent = ips.size || '—';
+  const oses = {};
+  entries.forEach(e => { const os = detectOS(e.navigateur?.user_agent||''); oses[os]=(oses[os]||0)+1; });
+  const top = Object.entries(oses).sort((a,b)=>b[1]-a[1])[0];
+  document.getElementById('sOS').textContent = top?top[0]:'—';
+  document.getElementById('sOSSub').textContent = top ? top[1]+' visite(s)' : '—';
+}
 
-  function parseEntry(req) {
-    try {
-      const body = typeof req.content === 'string'
-        ? JSON.parse(req.content)
-        : req.content;
-      return body;
-    } catch {
-      return null;
-    }
+function renderList(entries) {
+  const list = document.getElementById('eList');
+  list.innerHTML = '';
+  document.getElementById('eCount').textContent = entries.length + ' entrée(s)';
+  if (!entries.length) {
+    list.innerHTML = '<div style="text-align:center;padding:40px;color:var(--muted);font-size:11px;letter-spacing:.1em">AUCUNE VISITE ENREGISTRÉE</div>';
+    return;
   }
-
-  function detectBrowser(ua = '') {
-    if (ua.includes('Firefox')) return 'Firefox';
-    if (ua.includes('Edg/')) return 'Edge';
-    if (ua.includes('OPR') || ua.includes('Opera')) return 'Opera';
-    if (ua.includes('Chrome')) return 'Chrome';
-    if (ua.includes('Safari')) return 'Safari';
-    return 'Inconnu';
-  }
-
-  function detectOS(ua = '') {
-    if (ua.includes('Windows NT')) return 'Windows';
-    if (ua.includes('Mac OS X')) return 'macOS';
-    if (ua.includes('Android')) return 'Android';
-    if (ua.includes('iPhone') || ua.includes('iPad')) return 'iOS';
-    if (ua.includes('Linux')) return 'Linux';
-    return 'Inconnu';
-  }
-
-  function renderStats(entries) {
-    const parsed = entries.map(e => parseEntry(e)).filter(Boolean);
-
-    document.getElementById('statTotal').textContent = entries.length;
-
-    if (entries.length > 0) {
-      const last = entries[0];
-      const d = new Date(last.created_at || Date.now());
-      document.getElementById('statLast').textContent = d.toLocaleTimeString('fr-FR', {hour:'2-digit',minute:'2-digit'});
-      document.getElementById('statLastSub').textContent = d.toLocaleDateString('fr-FR');
-    }
-
-    const ips = new Set(parsed.map(p => p?.reseau?.ip_publique || p?.meta?.ip_publique).filter(Boolean));
-    document.getElementById('statIPs').textContent = ips.size || '—';
-
-    const oses = {};
-    parsed.forEach(p => {
-      const ua = p?.navigateur?.user_agent || '';
-      const os = detectOS(ua);
-      oses[os] = (oses[os] || 0) + 1;
-    });
-    const topOS = Object.entries(oses).sort((a,b) => b[1]-a[1])[0];
-    document.getElementById('statPlatforms').textContent = Object.keys(oses).length || '—';
-    document.getElementById('statPlatformsSub').textContent = topOS ? topOS[0] + ' (majorité)' : '—';
-  }
-
-  function renderList(entries) {
-    const list = document.getElementById('entriesList');
-    list.innerHTML = '';
-
-    if (entries.length === 0) {
-      list.innerHTML = '<div style="text-align:center;padding:40px;color:var(--muted);font-size:11px;letter-spacing:0.1em">AUCUNE ENTRÉE</div>';
-      document.getElementById('entriesCount').textContent = '0 requête(s)';
-      return;
-    }
-
-    document.getElementById('entriesCount').textContent = entries.length + ' requête(s)';
-
-    entries.forEach((req, i) => {
-      const body = parseEntry(req);
-      const ua = body?.navigateur?.user_agent || '';
-      const browser = detectBrowser(ua);
-      const os = detectOS(ua);
-      const ip = body?.reseau?.ip_publique || body?.meta?.ip_publique || req.ip || '?.?.?.?';
-      const ts = new Date(req.created_at || body?.meta?.timestamp || Date.now());
-      const screen = body?.materiel?.ecran_resolution || '—';
-      const lang = body?.navigateur?.langue || '—';
-
-      const card = document.createElement('div');
-      card.className = 'entry-card';
-      card.dataset.idx = i;
-      card.innerHTML = `
-        <div class="entry-top">
-          <span class="entry-num">#${String(entries.length - i).padStart(3,'0')}</span>
-          <span class="entry-time">${ts.toLocaleTimeString('fr-FR')} · ${ts.toLocaleDateString('fr-FR')}</span>
-        </div>
-        <div class="entry-ip">${ip}</div>
-        <div class="entry-chips">
-          <span class="chip">${browser}</span>
-          <span class="chip">${os}</span>
-          <span class="chip">${screen}</span>
-          <span class="chip">${lang}</span>
-        </div>
-      `;
-      card.addEventListener('click', () => selectEntry(i, card));
-      list.appendChild(card);
-    });
-  }
-
-  function selectEntry(i, card) {
-    document.querySelectorAll('.entry-card').forEach(c => c.classList.remove('active'));
-    card.classList.add('active');
-    selectedIdx = i;
-    renderDetail(allEntries[i]);
-  }
-
-  function renderDetail(req) {
-    const body = parseEntry(req);
-    const panel = document.getElementById('detailPanel');
-    document.getElementById('detailTitle').textContent = body?.meta?.ip_publique || req.ip || '—';
-
-    if (!body) {
-      panel.innerHTML = `<div class="detail-empty"><div>FORMAT INCONNU</div><div style="font-size:9px;margin-top:4px">Données brutes non parsables</div></div>`;
-      return;
-    }
-
-    const sections = [
-      {
-        icon: '📡', label: 'Meta',
-        rows: [
-          ['Timestamp', body.meta?.date_lisible || body.meta?.timestamp, 'accent'],
-          ['IP publique', body.meta?.ip_publique, 'accent'],
-          ['Source URL', body.meta?.url_source],
-          ['Referrer', body.meta?.referrer || 'direct'],
-        ]
-      },
-      {
-        icon: '🌐', label: 'Navigateur',
-        rows: [
-          ['Navigateur', detectBrowser(body.navigateur?.user_agent), 'accent4'],
-          ['OS', detectOS(body.navigateur?.user_agent), 'accent4'],
-          ['Langue', body.navigateur?.langue],
-          ['Langues', body.navigateur?.langues],
-          ['Do Not Track', body.navigateur?.do_not_track],
-          ['Cookies', body.navigateur?.cookies_actifs ? 'Actifs' : 'Désactivés'],
-          ['En ligne', body.navigateur?.online ? 'Oui' : 'Non'],
-        ]
-      },
-      {
-        icon: '💻', label: 'Matériel',
-        rows: [
-          ['CPU cœurs', body.materiel?.cpu_coeurs, 'accent3'],
-          ['RAM', body.materiel?.ram_go ? body.materiel.ram_go + ' Go' : 'N/A', 'accent3'],
-          ['GPU', body.materiel?.gpu],
-          ['Résolution', body.materiel?.ecran_resolution],
-          ['Dispo écran', body.materiel?.ecran_disponible],
-          ['Ratio pixel', body.materiel?.ratio_pixel + 'x'],
-          ['Couleur', body.materiel?.profondeur_couleur],
-          ['Fenêtre', body.materiel?.fenetre],
-          ['Orientation', body.materiel?.orientation],
-          ['Tactile', body.materiel?.ecran_tactile ? 'Oui (' + body.materiel?.nb_points_touch + ' pts)' : 'Non'],
-        ]
-      },
-      {
-        icon: '📶', label: 'Réseau',
-        rows: [
-          ['Type', body.reseau?.type],
-          ['Qualité', body.reseau?.qualite, 'accent'],
-          ['Débit', body.reseau?.debit],
-          ['Latence RTT', body.reseau?.latence],
-        ]
-      },
-      {
-        icon: '🔋', label: 'Batterie',
-        rows: [
-          ['Niveau', body.batterie?.level, body.batterie?.level && body.batterie.level !== 'N/A' ? 'accent' : ''],
-          ['En charge', body.batterie?.charging],
-        ]
-      },
-      {
-        icon: '🎛️', label: 'Périphériques',
-        rows: [
-          ['Caméras', body.peripheriques?.cameras],
-          ['Micros', body.peripheriques?.microphones],
-          ['Haut-parleurs', body.peripheriques?.speakers],
-        ]
-      },
-      {
-        icon: '🕐', label: 'Temps',
-        rows: [
-          ['Fuseau', body.temps?.fuseau],
-          ['UTC offset', body.temps?.offset_utc],
-        ]
-      },
-      {
-        icon: '⚡', label: 'Performance',
-        rows: [
-          ['Mémoire JS', body.performance?.memoire_js],
-        ]
-      },
-    ];
-
-    panel.innerHTML = sections.map(s => `
-      <div class="detail-section">
-        <div class="detail-section-header">
-          <span>${s.icon}</span>
-          <span>${s.label}</span>
-        </div>
-        <div class="detail-rows">
-          ${s.rows.filter(([,v]) => v != null && v !== 'N/A' && v !== undefined).map(([k,v,cls]) => `
-            <div class="detail-row">
-              <span class="detail-key">${k}</span>
-              <span class="detail-val ${cls||''}">${v ?? '—'}</span>
-            </div>
-          `).join('')}
-        </div>
+  entries.forEach((e, i) => {
+    const ua = e.navigateur?.user_agent||'';
+    const ip = e.reseau?.ip || e.meta?.ip || '?.?.?.?';
+    const ts = new Date(e.timestamp||Date.now());
+    const card = document.createElement('div');
+    card.className = 'ecard';
+    card.innerHTML = `
+      <div class="etop">
+        <span class="enum">#${String(entries.length-i).padStart(3,'0')}</span>
+        <span class="etime">${ts.toLocaleTimeString('fr-FR')} · ${ts.toLocaleDateString('fr-FR')}</span>
       </div>
-    `).join('');
+      <div class="eip">${ip}</div>
+      <div class="echips">
+        <span class="echip">${detectBrowser(ua)}</span>
+        <span class="echip">${detectOS(ua)}</span>
+        <span class="echip">${e.materiel?.ecran||'—'}</span>
+        <span class="echip">${e.navigateur?.langue||'—'}</span>
+        ${e.batterie?.level && e.batterie.level!=='N/A'?`<span class="echip">🔋${e.batterie.level}</span>`:''}
+      </div>`;
+    card.addEventListener('click', () => {
+      document.querySelectorAll('.ecard').forEach(c=>c.classList.remove('active'));
+      card.classList.add('active');
+      renderDetail(e);
+    });
+    list.appendChild(card);
+  });
+}
+
+function renderDetail(e) {
+  document.getElementById('dTitle').textContent = e.reseau?.ip || e.meta?.ip || '—';
+  const ua = e.navigateur?.user_agent||'';
+  const sections = [
+    { icon:'📡', label:'Meta', rows:[
+      ['Timestamp', e.date_fr||e.timestamp, 'a1'],
+      ['IP', e.reseau?.ip||e.meta?.ip, 'a1'],
+      ['URL', e.meta?.url],
+      ['Referrer', e.meta?.referrer||'direct'],
+    ]},
+    { icon:'🌐', label:'Navigateur', rows:[
+      ['Navigateur', detectBrowser(ua), 'a4'],
+      ['OS', detectOS(ua), 'a4'],
+      ['Langue', e.navigateur?.langue],
+      ['Toutes langues', e.navigateur?.langues],
+      ['Cookies', e.navigateur?.cookies ? 'Actifs' : 'Non'],
+      ['DNT', e.navigateur?.dnt],
+      ['Online', e.navigateur?.online ? 'Oui' : 'Non'],
+    ]},
+    { icon:'💻', label:'Matériel', rows:[
+      ['CPU cœurs', e.materiel?.cpu_coeurs, 'a3'],
+      ['RAM', e.materiel?.ram_go ? e.materiel.ram_go+' Go' : 'N/A', 'a3'],
+      ['GPU', e.materiel?.gpu],
+      ['Résolution', e.materiel?.ecran],
+      ['Dispo', e.materiel?.ecran_dispo],
+      ['Pixel ratio', e.materiel?.ratio_pixel+'x'],
+      ['Couleur', e.materiel?.couleur],
+      ['Fenêtre', e.materiel?.fenetre],
+      ['Orientation', e.materiel?.orientation],
+      ['Tactile', e.materiel?.tactile ? 'Oui ('+e.materiel.touch_points+' pts)' : 'Non'],
+    ]},
+    { icon:'📶', label:'Réseau', rows:[
+      ['Type', e.reseau?.type],
+      ['Qualité', e.reseau?.effectiveType, 'a1'],
+      ['Débit', e.reseau?.downlink],
+      ['RTT', e.reseau?.rtt],
+    ]},
+    { icon:'🔋', label:'Batterie', rows:[
+      ['Niveau', e.batterie?.level, 'a1'],
+      ['En charge', e.batterie?.charging],
+    ]},
+    { icon:'🎛️', label:'Périphériques', rows:[
+      ['Caméras', e.peripheriques?.cameras],
+      ['Micros', e.peripheriques?.microphones],
+      ['HP', e.peripheriques?.speakers],
+    ]},
+    { icon:'🕐', label:'Temps', rows:[
+      ['Fuseau', e.temps?.fuseau],
+      ['UTC offset', e.temps?.offset_utc],
+    ]},
+    { icon:'⚡', label:'Perf', rows:[
+      ['Mém. JS', e.perf?.mem_js],
+    ]},
+  ];
+  document.getElementById('dPanel').innerHTML = sections.map(s => `
+    <div class="dsec">
+      <div class="dsec-head"><span>${s.icon}</span><span>${s.label}</span></div>
+      <div class="drows">${s.rows.filter(([,v])=>v!=null&&v!==undefined&&v!=='N/A').map(([k,v,cls])=>`
+        <div class="drow"><span class="dk">${k}</span><span class="dv ${cls||''}">${v}</span></div>
+      `).join('')}</div>
+    </div>`).join('');
+}
+
+async function load() {
+  const key = document.getElementById('keyInput').value.trim();
+  const binId = getBinId();
+  if (!key) { dbg('Master Key manquante', 'err'); return; }
+  if (!binId) { dbg('Bin ID introuvable — visite d\'abord tracker.html pour créer le bin', 'warn'); toast('⚠ Pas de Bin ID'); return; }
+
+  document.getElementById('binInput').value = binId;
+  document.getElementById('liveStatus').textContent = 'CHARGEMENT…';
+  dbg('Bin ID : ' + binId);
+  dbg('→ Lecture JSONBin…');
+
+  try {
+    const t0 = performance.now();
+    const res = await fetch(`https://api.jsonbin.io/v3/b/${binId}/latest`, {
+      headers: { 'X-Master-Key': key, 'X-Bin-Meta': 'false' }
+    });
+    const ms = Math.round(performance.now()-t0);
+    dbg('HTTP ' + res.status + ' en ' + ms + 'ms', res.ok?'ok':'err');
+    if (!res.ok) { const t=await res.text(); dbg(t.substring(0,120),'err'); throw new Error('HTTP '+res.status); }
+    const data = await res.json();
+    const entries = Array.isArray(data) ? data : [];
+    dbg(entries.length + ' entrée(s) reçue(s)', 'ok');
+    allEntries = entries;
+    renderStats(entries);
+    renderList(entries);
+    toast('✓ ' + entries.length + ' entrée(s)');
+    document.getElementById('liveStatus').textContent = 'EN DIRECT';
+  } catch(e) {
+    dbg('Erreur : ' + e.message, 'err');
+    document.getElementById('liveStatus').textContent = 'ERREUR';
+    toast('✗ Erreur');
   }
+}
 
-  function dbg(msg, type = 'info') {
-    const box = document.getElementById('debugBox');
-    if (!box) return;
-    const colors = { info: 'var(--muted)', ok: 'var(--accent)', err: 'var(--accent2)', warn: '#f59e0b' };
-    const icons = { info: '·', ok: '✓', err: '✗', warn: '!' };
-    const line = document.createElement('div');
-    line.style.cssText = `color:${colors[type]};font-size:9px;padding:2px 0;border-bottom:1px solid var(--border);`;
-    line.innerHTML = `<span style="opacity:.4">${new Date().toLocaleTimeString('fr-FR')}</span> <span style="color:${colors[type]}">${icons[type]}</span> ${msg}`;
-    box.appendChild(line);
-    box.scrollTop = box.scrollHeight;
-  }
+async function clearAllData() {
+  const key = document.getElementById('keyInput').value.trim();
+  const binId = getBinId();
+  if (!key||!binId) { toast('⚠ Clé ou Bin ID manquant'); return; }
+  if (!confirm('Vider toutes les entrées ?')) return;
+  try {
+    await fetch(`https://api.jsonbin.io/v3/b/${binId}`, {
+      method:'PUT',
+      headers:{'Content-Type':'application/json','X-Master-Key':key},
+      body:JSON.stringify([])
+    });
+    allEntries = [];
+    renderStats([]);
+    renderList([]);
+    dbg('Bin vidé', 'ok');
+    toast('✓ Données effacées');
+  } catch(e) { dbg('Erreur vidage : '+e.message,'err'); }
+}
 
-  async function loadWebhook() {
-    const rawUrl = document.getElementById('webhookInput').value.trim();
-    if (!rawUrl) return;
-
-    document.getElementById('loadingState')?.remove();
-    document.getElementById('entriesList').innerHTML = '<div id="loadingState"><div class="spinner"></div><div>CHARGEMENT...</div></div>';
-    document.getElementById('liveStatus').textContent = 'CHARGEMENT...';
-
-    // Extract UUID from any format pasted
-    const uuidMatch = rawUrl.match(/([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})/i);
-    const uuid = uuidMatch ? uuidMatch[1] : null;
-    const apiUrl = uuid
-      ? `https://webhook.site/token/${uuid}/requests?per_page=100&page=1`
-      : rawUrl;
-
-    dbg('UUID extrait : ' + (uuid || 'non trouvé'));
-    dbg('URL API : ' + apiUrl);
-
-    // Test 1: ping webhook.site root
-    dbg('→ Test connectivité webhook.site…');
-    try {
-      const pingRes = await fetch('https://webhook.site/', { method: 'HEAD', mode: 'no-cors' });
-      dbg('Ping webhook.site : mode opaque (réseau OK)', 'ok');
-    } catch(e) {
-      dbg('Ping échoué : ' + e.message, 'err');
-    }
-
-    // Test 2: fetch the API
-    dbg('→ Appel API token/requests…');
-    try {
-      const t0 = performance.now();
-      const res = await fetch(apiUrl, {
-        headers: { 'Accept': 'application/json' }
-      });
-      const t1 = performance.now();
-      dbg(`HTTP ${res.status} ${res.statusText} en ${Math.round(t1-t0)}ms`, res.ok ? 'ok' : 'err');
-
-      // Log response headers
-      for (const [k,v] of res.headers.entries()) {
-        if (['content-type','access-control-allow-origin','x-ratelimit-remaining'].includes(k.toLowerCase()))
-          dbg(`Header: ${k}: ${v}`, 'info');
-      }
-
-      if (!res.ok) {
-        const txt = await res.text();
-        dbg('Body erreur : ' + txt.substring(0, 200), 'err');
-        throw new Error('HTTP ' + res.status);
-      }
-
-      const data = await res.json();
-      dbg('JSON reçu — clés : ' + Object.keys(data).join(', '), 'ok');
-      dbg('data.data length : ' + (data.data?.length ?? 'undefined'), 'ok');
-
-      const entries = data.data || [];
-      allEntries = entries;
-      renderStats(entries);
-      renderList(entries);
-      showToast('✓ ' + entries.length + ' entrée(s)');
-      document.getElementById('liveStatus').textContent = 'EN DIRECT';
-      dbg('Rendu terminé — ' + entries.length + ' entrées', 'ok');
-
-    } catch(e) {
-      dbg('Erreur fetch : ' + e.name + ' — ' + e.message, 'err');
-      dbg('Cause probable : CORS bloqué par webhook.site (compte gratuit)', 'warn');
-      dbg('Solution : coller le token API depuis webhook.site (Settings)', 'warn');
-
-      document.getElementById('entriesList').innerHTML = `
-        <div style="padding:20px;color:var(--accent2);font-size:10px;letter-spacing:0.1em;line-height:1.8">
-          <div style="font-size:13px;font-weight:700;margin-bottom:12px">CORS BLOQUÉ</div>
-          <div style="color:var(--muted)">
-            Webhook.site bloque l'accès API depuis un navigateur sans token d'auth.<br><br>
-            <b style="color:var(--text)">Solution :</b><br>
-            1. Sur webhook.site → <b>Login / Sign Up</b><br>
-            2. Récupère ton <b>API Token</b> dans Settings<br>
-            3. Colle-le dans le champ ci-dessous<br><br>
-            <b style="color:var(--accent)">OU</b> utilise directement webhook.site pour lire les données — tout y est déjà.
-          </div>
-        </div>`;
-      document.getElementById('liveStatus').textContent = 'ERREUR CORS';
-      showToast('✗ Voir debug panel');
-    }
-  }
-
-  // Token auth test
-  async function loadWithToken() {
-    const token = document.getElementById('tokenInput')?.value?.trim();
-    const rawUrl = document.getElementById('webhookInput').value.trim();
-    const uuidMatch = rawUrl.match(/([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})/i);
-    const uuid = uuidMatch?.[1];
-    if (!uuid || !token) { dbg('UUID ou token manquant', 'err'); return; }
-
-    const apiUrl = `https://webhook.site/token/${uuid}/requests?per_page=100&page=1`;
-    dbg('→ Appel avec API token…');
-    try {
-      const res = await fetch(apiUrl, {
-        headers: { 'Accept': 'application/json', 'Api-Key': token }
-      });
-      dbg('HTTP ' + res.status, res.ok ? 'ok' : 'err');
-      if (!res.ok) { const t = await res.text(); dbg(t.substring(0,200), 'err'); return; }
-      const data = await res.json();
-      const entries = data.data || [];
-      allEntries = entries;
-      renderStats(entries);
-      renderList(entries);
-      showToast('✓ ' + entries.length + ' entrée(s) via token');
-      document.getElementById('liveStatus').textContent = 'AUTH OK';
-      dbg('✓ Auth token fonctionne !', 'ok');
-    } catch(e) {
-      dbg('Token fetch échoué : ' + e.message, 'err');
-    }
-  }
-
-  loadWebhook();
-  setInterval(loadWebhook, 20000);
+// Auto-refresh 20s
+const binId = localStorage.getItem(BIN_ID_KEY);
+if (binId) { document.getElementById('binInput').value = binId; load(); }
+setInterval(load, 20000);
 </script>
 </body>
 </html>
